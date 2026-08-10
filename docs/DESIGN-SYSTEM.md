@@ -77,13 +77,13 @@ Root Stack
 | --- | --- | --- |
 | Home | `/(tabs)` | Implemented (mock data) |
 | Kitchen | `/(tabs)/kitchen` | Implemented (mock data) |
-| Voice capture | `/voice` | Placeholder |
+| Voice capture | `/voice` | Implemented (mock + orb) |
 | Disambiguation | `/disambiguation` | Placeholder |
-| Cart review | `/cart` | Placeholder |
-| Order status | `/order-status` | Placeholder |
+| Cart review | `/cart` | Implemented (mock data) |
+| Order status | `/order-status` | Implemented (mock data) |
 | Ingredient selection | `/ingredients` | Implemented (mock data) |
-| Order history | `/history` | Placeholder |
-| Settings | `/settings` | Placeholder |
+| Order history | `/history` | Implemented (mock data) |
+| Settings | `/settings` | Implemented (mock data) |
 
 Plan / Analytics from the PRD are not in the current design HTML shell; add when product asks.
 
