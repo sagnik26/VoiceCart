@@ -2,6 +2,7 @@ import '../../globals.css';
 
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
@@ -37,8 +38,10 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <ThemeModeProvider>
-      <RootNavigator />
-    </ThemeModeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeModeProvider>
+        <RootNavigator />
+      </ThemeModeProvider>
+    </GestureHandlerRootView>
   );
 }

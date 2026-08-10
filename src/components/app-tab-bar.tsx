@@ -1,10 +1,21 @@
-import { useRouter, usePathname } from 'expo-router';
+import { usePathname, useRouter } from 'expo-router';
 import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { createAnimatedPressable, PressableScale, PressablesConfig } from 'pressto';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Brand, Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+
+const TAB_SPRING = { damping: 22, stiffness: 140, mass: 0.85 } as const;
+const PRESS_ROTATE_DEG = 45;
+
+const PressableRotate = createAnimatedPressable((progress) => {
+  'worklet';
+  return {
+    transform: [{ rotate: `${progress * PRESS_ROTATE_DEG}deg` }],
+  };
+});
 
 function HomeIcon({ color }: { color: string }) {
   return (
@@ -33,10 +44,6 @@ function MicIcon() {
   );
 }
 
-/**
- * Custom tab bar: Home · raised Talk · Kitchen.
- * Talk pushes `/voice` (stack) rather than selecting a tab route.
- */
 export function AppTabBar({ state, navigation }: BottomTabBarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -48,7 +55,6 @@ export function AppTabBar({ state, navigation }: BottomTabBarProps) {
   const homeActive = activeRoute === 'index';
   const kitchenActive = activeRoute === 'kitchen';
 
-  // Hide when a stack screen is covering tabs (path not a tab root)
   if (
     pathname.startsWith('/voice') ||
     pathname.startsWith('/cart') ||
@@ -62,64 +68,77 @@ export function AppTabBar({ state, navigation }: BottomTabBarProps) {
   }
 
   return (
-    <View
-      style={[
-        styles.bar,
-        {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
-          paddingBottom: Math.max(insets.bottom, 12),
-        },
-      ]}
+    <PressablesConfig
+      animationType="spring"
+      animationConfig={TAB_SPRING}
+      defaultProps={{ rippleColor: 'transparent' }}
     >
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={{ selected: homeActive }}
-        onPress={() => navigation.navigate('index')}
-        style={styles.sideTab}
+      <View
+        style={[
+          styles.bar,
+          {
+            backgroundColor: colors.background,
+            borderTopColor: colors.border,
+            paddingBottom: Math.max(insets.bottom, 12),
+          },
+        ]}
       >
-        <HomeIcon color={homeActive ? Brand.primary : colors.textSecondary} />
-        <Text
-          style={[
-            styles.label,
-            { color: homeActive ? Brand.primary : colors.textSecondary },
-            homeActive && styles.labelActive,
-          ]}
+        <PressableRotate
+          accessibilityRole="button"
+          accessibilityState={{ selected: homeActive }}
+          onPress={() => navigation.navigate('index')}
+          style={styles.sideTab}
         >
-          Home
-        </Text>
-      </Pressable>
+          <HomeIcon color={homeActive ? Brand.primary : colors.textSecondary} />
+          <Text
+            style={[
+              styles.label,
+              { color: homeActive ? Brand.primary : colors.textSecondary },
+              homeActive && styles.labelActive,
+            ]}
+          >
+            Home
+          </Text>
+        </PressableRotate>
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Talk"
-        onPress={() => router.push('/voice')}
-        style={styles.talkWrap}
-      >
-        <View style={[styles.talkButton, { backgroundColor: Brand.primary }]}>
-          <MicIcon />
-        </View>
-        <Text style={[styles.label, { color: colors.textSecondary }]}>Talk</Text>
-      </Pressable>
-
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={{ selected: kitchenActive }}
-        onPress={() => navigation.navigate('kitchen')}
-        style={styles.sideTab}
-      >
-        <KitchenIcon color={kitchenActive ? Brand.primary : colors.textSecondary} />
-        <Text
-          style={[
-            styles.label,
-            { color: kitchenActive ? Brand.primary : colors.textSecondary },
-            kitchenActive && styles.labelActive,
-          ]}
+        <PressablesConfig
+          animationType="spring"
+          animationConfig={TAB_SPRING}
+          config={{ baseScale: 1, minScale: 1.08 }}
+          defaultProps={{ rippleColor: 'transparent' }}
         >
-          Kitchen
-        </Text>
-      </Pressable>
-    </View>
+          <PressableScale
+            accessibilityRole="button"
+            accessibilityLabel="Talk"
+            onPress={() => router.push('/voice')}
+            style={styles.talkWrap}
+          >
+            <View style={[styles.talkButton, { backgroundColor: Brand.primary }]}>
+              <MicIcon />
+            </View>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Talk</Text>
+          </PressableScale>
+        </PressablesConfig>
+
+        <PressableRotate
+          accessibilityRole="button"
+          accessibilityState={{ selected: kitchenActive }}
+          onPress={() => navigation.navigate('kitchen')}
+          style={styles.sideTab}
+        >
+          <KitchenIcon color={kitchenActive ? Brand.primary : colors.textSecondary} />
+          <Text
+            style={[
+              styles.label,
+              { color: kitchenActive ? Brand.primary : colors.textSecondary },
+              kitchenActive && styles.labelActive,
+            ]}
+          >
+            Kitchen
+          </Text>
+        </PressableRotate>
+      </View>
+    </PressablesConfig>
   );
 }
 

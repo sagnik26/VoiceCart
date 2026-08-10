@@ -1,0 +1,13 @@
+---
+description: Route pressable/button tap animation work to the pressto-pressables skill
+globs: "**/*.{tsx,ts,jsx,js}"
+alwaysApply: false
+---
+
+# Pressto pressables
+
+When editing matched files for **animated button / pressable tap interactions** in React Native or Expo:
+
+1. Open [`.cursor/skills/pressto-pressables/SKILL.md`](../skills/pressto-pressables/SKILL.md).
+2. Prefer `pressto` (`PressableScale`, `PressableOpacity`, `createAnimatedPressable`) over hand-rolled `Pressable` + Reanimated for simple taps.
+3. Ensure `GestureHandlerRootView` wraps the app root before using pressto components.
