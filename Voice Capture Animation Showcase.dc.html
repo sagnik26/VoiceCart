@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="_ds/gluestack-design-system-2b730979-d2c7-47a4-a884-ecab8d5de1d6/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/gluestack-design-system-2b730979-d2c7-47a4-a884-ecab8d5de1d6/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/gluestack-design-system-2b730979-d2c7-47a4-a884-ecab8d5de1d6/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/gluestack-design-system-2b730979-d2c7-47a4-a884-ecab8d5de1d6/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/gluestack-design-system-2b730979-d2c7-47a4-a884-ecab8d5de1d6/styles.css">
+  <script src="_ds/gluestack-design-system-2b730979-d2c7-47a4-a884-ecab8d5de1d6/_ds_bundle.js"></script>
+  <script>
+    window.OM_SCENES = '[{"name":"Listening","dur":2.4,"desc":"The orb breathes as an organic blob, out of phase with itself, actively listening"},{"name":"Understanding","dur":3.8,"desc":"The orb tightens and recognized items fade into a scrollable list one by one as they are heard"},{"name":"Thinking","dur":1.2,"desc":"The orb contracts and orbiting segments spin around the core while it processes the order"},{"name":"Speaking","dur":2.2,"desc":"The orb ripples outward in rhythmic waves as it confirms the order and the Show cart button glows warmly"}]';
+    window.OM_PLAYBACK = '{"mode":"times","count":2}';
+  </script>
+  <style>
+    body{margin:0;background:#EDEBE6;font-family:'Outfit',sans-serif;}
+    ::-webkit-scrollbar{display:none}
+  </style>
+</helmet>
+<div style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:#EDEBE6;padding:32px;box-sizing:border-box;">
+  <x-import component-from-global-scope="VoiceCaptureShowcase" from="./animations-v3.jsx ./tweaks-panel.jsx ./voice-capture-scene.jsx" hint-size="480,854"></x-import>
+</div>
+
+</x-dc>
+</body>
+</html>
