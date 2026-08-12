@@ -1,41 +1,18 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { Appearance, useColorScheme as useSystemColorScheme } from 'react-native';
+import React, { createContext, useContext, useMemo } from 'react';
 
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = 'dark';
 
 type ThemeModeContextValue = {
   mode: ThemeMode;
-  isDark: boolean;
-  toggleMode: () => void;
-  setMode: (mode: ThemeMode) => void;
+  isDark: true;
 };
 
 const ThemeModeContext = createContext<ThemeModeContextValue | null>(null);
 
+const DARK_VALUE: ThemeModeContextValue = { mode: 'dark', isDark: true };
+
 export function ThemeModeProvider({ children }: { children: React.ReactNode }) {
-  const system = useSystemColorScheme();
-  const [override, setOverride] = useState<ThemeMode | null>(null);
-
-  const mode: ThemeMode = override ?? (system === 'dark' ? 'dark' : 'light');
-
-  const setMode = useCallback((next: ThemeMode) => {
-    setOverride(next);
-    Appearance.setColorScheme?.(next);
-  }, []);
-
-  const toggleMode = useCallback(() => {
-    setMode(mode === 'dark' ? 'light' : 'dark');
-  }, [mode, setMode]);
-
-  const value = useMemo(
-    () => ({
-      mode,
-      isDark: mode === 'dark',
-      toggleMode,
-      setMode,
-    }),
-    [mode, toggleMode, setMode]
-  );
+  const value = useMemo(() => DARK_VALUE, []);
 
   return <ThemeModeContext.Provider value={value}>{children}</ThemeModeContext.Provider>;
 }

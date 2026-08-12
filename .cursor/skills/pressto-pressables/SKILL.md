@@ -98,6 +98,12 @@ Prefer a soft spring over snappy defaults when press motion feels too fast:
 
 Tune: lower `stiffness` / higher `mass` = slower; higher `damping` = less bounce.
 
+**Stable config references:** hoist `animationConfig`, `config`, and `defaultProps` to module-level constants. Inline objects (`defaultProps={{ rippleColor: 'transparent' }}`) recreate every render, refresh Pressto context, and can trigger Reanimated’s “Reading from `value` during component render” warning.
+
+Also memoize `onPress` / `accessibilityState` with `useCallback` / `useMemo`, and avoid nested `PressablesConfig` when a custom `createAnimatedPressable` can encode the different motion (e.g. Talk scale-up).
+
+If the strict warning still appears from Pressto itself, `configureReanimatedLogger({ strict: false })` in root layout is acceptable — it only disables that check.
+
 ## PressablesConfig
 
 - Scope to the feature (e.g. tab bar) unless the user asks for app-wide defaults.

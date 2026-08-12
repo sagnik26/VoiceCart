@@ -1,23 +1,24 @@
 import React, { useEffect } from 'react';
-import { config } from './config';
-import { View, ViewProps } from 'react-native';
+import { View, type ViewProps } from 'react-native';
+import { useColorScheme } from 'nativewind';
+
 import { OverlayProvider } from '@gluestack-ui/core/overlay/creator';
 import { ToastProvider } from '@gluestack-ui/core/toast/creator';
-import { useColorScheme } from 'nativewind';
+
+import { config } from './config';
 import {
-  useGluestackColors as useGluestackColorsHook,
   useCalendarTheme as useCalendarThemeHook,
+  useGluestackColors as useGluestackColorsHook,
 } from './useGluestackColors';
 
 export type ModeType = 'light' | 'dark' | 'system';
 
-// Re-export color hooks
 export const useGluestackColors = useGluestackColorsHook;
 export const useCalendarTheme = useCalendarThemeHook;
 export type { GluestackColors } from './useGluestackColors';
 
 export function GluestackUIProvider({
-  mode = 'light',
+  mode = 'dark',
   ...props
 }: {
   mode?: ModeType;
@@ -26,7 +27,14 @@ export function GluestackUIProvider({
 }) {
   const { colorScheme, setColorScheme } = useColorScheme();
 
+  // Forced modes: style from `mode`, not live NativeWind scheme (debug menu flips it).
+  const resolved: 'light' | 'dark' =
+    mode === 'system' ? (colorScheme === 'light' ? 'light' : 'dark') : mode;
+
+  // Set once per mode change — do not depend on `colorScheme` or every flip re-renders
+  // the tree and triggers Reanimated/pressto "read value during render" warnings.
   useEffect(() => {
+    if (mode === 'system') return;
     setColorScheme(mode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
@@ -34,7 +42,7 @@ export function GluestackUIProvider({
   return (
     <View
       style={[
-        config[colorScheme!],
+        config[resolved],
         { flex: 1, height: '100%', width: '100%' },
         props.style,
       ]}

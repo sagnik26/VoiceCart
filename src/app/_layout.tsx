@@ -3,11 +3,19 @@ import '../../globals.css';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
-import { Brand } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 import { ThemeModeProvider, useThemeMode } from '@/theme/theme-mode';
+
+// Pressto reads shared values when rebuilding animated styles on re-render.
+// Strict mode only warns; disable it for this known third-party pattern.
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false,
+});
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,7 +28,7 @@ function RootNavigator() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: Brand.surface },
+          contentStyle: { backgroundColor: Colors.dark.background },
         }}
       >
         <Stack.Screen name="(tabs)" />

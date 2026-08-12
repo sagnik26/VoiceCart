@@ -11,12 +11,10 @@ import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { SETTINGS_PROFILE } from '@/data/settings-mock';
-import { useThemeMode } from '@/theme/theme-mode';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { isDark, toggleMode } = useThemeMode();
   const [notificationsOn, setNotificationsOn] = useState(true);
 
   const onBack = () => {
@@ -77,16 +75,6 @@ export default function SettingsScreen() {
                 value={notificationsOn}
                 onValueChange={setNotificationsOn}
                 accessibilityLabel="Notifications"
-              />
-            }
-          />
-          <SettingsRow
-            label="Dark mode"
-            trailing={
-              <SettingsSwitch
-                value={isDark}
-                onValueChange={() => toggleMode()}
-                accessibilityLabel="Dark mode"
               />
             }
           />

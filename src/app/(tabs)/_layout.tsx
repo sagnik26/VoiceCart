@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 
 import { AppTabBar } from '@/components/app-tab-bar';
-import { Brand } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 export default function TabsLayout() {
   return (
@@ -9,7 +9,7 @@ export default function TabsLayout() {
       tabBar={(props) => <AppTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        sceneStyle: { backgroundColor: Brand.surface },
+        sceneStyle: { backgroundColor: Colors.dark.background },
       }}
     >
       <Tabs.Screen name="index" options={{ title: 'Home' }} />

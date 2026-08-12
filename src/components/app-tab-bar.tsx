@@ -1,19 +1,28 @@
 import { usePathname, useRouter } from 'expo-router';
 import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs';
-import { createAnimatedPressable, PressableScale, PressablesConfig } from 'pressto';
+import { createAnimatedPressable, PressablesConfig } from 'pressto';
+import { useCallback, useMemo } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Brand, Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 
-const TAB_SPRING = { damping: 22, stiffness: 140, mass: 0.85 } as const;
+const TAB_SPRING = { damping: 20, stiffness: 360, mass: 0.35 } as const;
+const TAB_DEFAULT_PROPS = { rippleColor: 'transparent' } as const;
 const PRESS_ROTATE_DEG = 45;
+const TALK_SCALE_UP = 1.2;
 
 const PressableRotate = createAnimatedPressable((progress) => {
   'worklet';
   return {
     transform: [{ rotate: `${progress * PRESS_ROTATE_DEG}deg` }],
+  };
+});
+
+const PressableScaleUp = createAnimatedPressable((progress) => {
+  'worklet';
+  return {
+    transform: [{ scale: 1 + (TALK_SCALE_UP - 1) * progress }],
   };
 });
 
@@ -48,12 +57,28 @@ export function AppTabBar({ state, navigation }: BottomTabBarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
-  const scheme = useColorScheme();
-  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const colors = Colors.dark;
 
   const activeRoute = state.routes[state.index]?.name;
   const homeActive = activeRoute === 'index';
   const kitchenActive = activeRoute === 'kitchen';
+
+  const homeA11y = useMemo(() => ({ selected: homeActive }), [homeActive]);
+  const kitchenA11y = useMemo(() => ({ selected: kitchenActive }), [kitchenActive]);
+
+  const onHome = useCallback(() => {
+    navigation.navigate('index');
+  }, [navigation]);
+
+  const onTalk = useCallback(() => {
+    setTimeout(() => {
+      router.push('/voice');
+    }, 10);
+  }, [router]);
+
+  const onKitchen = useCallback(() => {
+    navigation.navigate('kitchen');
+  }, [navigation]);
 
   if (
     pathname.startsWith('/voice') ||
@@ -71,7 +96,7 @@ export function AppTabBar({ state, navigation }: BottomTabBarProps) {
     <PressablesConfig
       animationType="spring"
       animationConfig={TAB_SPRING}
-      defaultProps={{ rippleColor: 'transparent' }}
+      defaultProps={TAB_DEFAULT_PROPS}
     >
       <View
         style={[
@@ -85,8 +110,8 @@ export function AppTabBar({ state, navigation }: BottomTabBarProps) {
       >
         <PressableRotate
           accessibilityRole="button"
-          accessibilityState={{ selected: homeActive }}
-          onPress={() => navigation.navigate('index')}
+          accessibilityState={homeA11y}
+          onPress={onHome}
           style={styles.sideTab}
         >
           <HomeIcon color={homeActive ? Brand.primary : colors.textSecondary} />
@@ -101,29 +126,22 @@ export function AppTabBar({ state, navigation }: BottomTabBarProps) {
           </Text>
         </PressableRotate>
 
-        <PressablesConfig
-          animationType="spring"
-          animationConfig={TAB_SPRING}
-          config={{ baseScale: 1, minScale: 1.08 }}
-          defaultProps={{ rippleColor: 'transparent' }}
+        <PressableScaleUp
+          accessibilityRole="button"
+          accessibilityLabel="Talk"
+          onPress={onTalk}
+          style={styles.talkWrap}
         >
-          <PressableScale
-            accessibilityRole="button"
-            accessibilityLabel="Talk"
-            onPress={() => router.push('/voice')}
-            style={styles.talkWrap}
-          >
-            <View style={[styles.talkButton, { backgroundColor: Brand.primary }]}>
-              <MicIcon />
-            </View>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>Talk</Text>
-          </PressableScale>
-        </PressablesConfig>
+          <View style={[styles.talkButton, { backgroundColor: Brand.primary }]}>
+            <MicIcon />
+          </View>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Talk</Text>
+        </PressableScaleUp>
 
         <PressableRotate
           accessibilityRole="button"
-          accessibilityState={{ selected: kitchenActive }}
-          onPress={() => navigation.navigate('kitchen')}
+          accessibilityState={kitchenA11y}
+          onPress={onKitchen}
           style={styles.sideTab}
         >
           <KitchenIcon color={kitchenActive ? Brand.primary : colors.textSecondary} />

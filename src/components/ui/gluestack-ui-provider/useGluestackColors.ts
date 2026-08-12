@@ -1,4 +1,3 @@
-import { useColorScheme } from 'nativewind';
 import { colors } from './config';
 
 /**
@@ -39,8 +38,7 @@ function rgbToHex(rgbString: string): string {
  *          colors.forest -> '#228b22' (if you add --forest to config)
  */
 export function useGluestackColors(): Record<string, string> {
-  const { colorScheme } = useColorScheme();
-  const theme = colors[colorScheme || 'light'];
+  const theme = colors.dark;
 
   // Dynamically convert all CSS variables to camelCase hex colors
   const result: Record<string, string> = {};
