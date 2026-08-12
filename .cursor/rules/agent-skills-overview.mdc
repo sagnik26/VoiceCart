@@ -16,6 +16,7 @@ Use the copy under `skills/` when this repository is checked out; otherwise use 
 - [upgrading-react-native](https://github.com/callstackincubator/agent-skills/blob/main/skills/upgrading-react-native/SKILL.md) — RN / Expo upgrades
 - [react-native-brownfield-migration](https://github.com/callstackincubator/agent-skills/blob/main/skills/react-native-brownfield-migration/SKILL.md) — brownfield adoption
 - [pressto-pressables](../skills/pressto-pressables/SKILL.md) — animated tap interactions with pressto (scale, opacity, custom)
+- [voicecart-module-carve](../skills/voicecart-module-carve/SKILL.md) — rn-feature / rn-feature-core / global core package placement
 
 ## Consuming these rules in another project
 

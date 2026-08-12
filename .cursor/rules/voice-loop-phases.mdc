@@ -1,0 +1,22 @@
+---
+description: Phased VoiceCart Talk / LiveKit build — follow independently testable phases
+globs:
+  - apps/voicecart/src/app/voice.tsx
+  - apps/voicecart/features/rn-feature-voice/**
+  - apps/voicecart/core/rn-feature-voice-core/**
+  - docs/voice-app-architecture.md
+  - docs/voice-loop-build-phases.md
+  - docs/implementation/voice-ordering.md
+alwaysApply: false
+---
+
+# Voice loop build phases
+
+When working on Talk, LiveKit, mic UI, voice agent, or voice ordering:
+
+1. Read [`docs/voice-loop-build-phases.md`](../../docs/voice-loop-build-phases.md) and state which **phase** you are implementing.
+2. Treat phases as independently testable gates — especially **Phase 1 (level metering → orb)** before STT/agent/commerce.
+3. Architecture source of truth: [`docs/voice-app-architecture.md`](../../docs/voice-app-architecture.md).
+4. Product wiring: [`docs/implementation/voice-ordering.md`](../../docs/implementation/voice-ordering.md).
+5. Do not add Sarvam, OpenAI, or Swiggy into Phases 0–1.
+6. Agent must never gain a `placeOrder` tool; Place order stays on cart review.

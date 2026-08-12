@@ -6,15 +6,15 @@ Foundation for UI work. Product scope and screen specs live in [PRD-Voice-Food-O
 
 | Layer | Choice |
 | --- | --- |
-| App | Expo SDK 57, Expo Router (`src/app`) |
-| UI kit | [gluestack-ui](https://gluestack.io/) v5 (copy-paste components under `src/components/ui/`) |
+| App | Expo SDK 57, Expo Router (`apps/voicecart/src/app`) |
+| UI kit | [gluestack-ui](https://gluestack.io/) v5 (`@voicecart/rn-ui` → `core/modules/rn-ui/src/ui/`) |
 | Styling | NativeWind v4 + Tailwind CSS v3 (`className`) — CLI fell back from NativeWind v5 (not yet supported for this project shape) |
-| Tokens | `src/components/ui/gluestack-ui-provider/config.ts` + `src/constants/theme.ts` |
+| Tokens | `@voicecart/rn-ui` gluestack config + `@voicecart/rn-theme` |
 
-Do not add a second UI kit (Paper, NativeBase, Tamagui, etc.) without explicit approval. Prefer:
+Do not add a second UI kit (Paper, NativeBase, Tamagui, etc.) without explicit approval. Prefer (from `apps/voicecart`):
 
 ```bash
-npx gluestack-ui@latest add <component> -y --use-npm --path src/components/ui
+npx gluestack-ui@latest add <component> -y --use-npm --path ../../core/modules/rn-ui/src/ui
 ```
 
 ## Tokens
@@ -46,8 +46,8 @@ Typography (PRD baseline): ~14 px body for values, ~12 px labels; weight carries
 
 Update tokens in both:
 
-1. [`src/components/ui/gluestack-ui-provider/config.ts`](../src/components/ui/gluestack-ui-provider/config.ts) — NativeWind `vars` (RGB channels)
-2. [`src/constants/theme.ts`](../src/constants/theme.ts) — JS colors for StatusBar, splash, native tab tint
+1. [`core/modules/rn-ui/src/ui/gluestack-ui-provider/config.ts`](../core/modules/rn-ui/src/ui/gluestack-ui-provider/config.ts) — NativeWind `vars` (RGB channels)
+2. [`core/modules/rn-theme/src/theme.ts`](../core/modules/rn-theme/src/theme.ts) — JS colors for StatusBar, splash, native tab tint
 
 Then keep this doc in sync.
 
@@ -67,9 +67,10 @@ Root Stack
 └── settings
 ```
 
-- Tab bar: Home · raised Talk · Kitchen (`src/components/app-tab-bar.tsx`).
+- Tab bar: Home · raised Talk · Kitchen (`@voicecart/rn-ui` `AppTabBar`).
 - Talk calls `router.push('/voice')`; it is not a tab that keeps the bar.
 - Stack screens hide the tab bar by default.
+- Feature UI lives in `apps/voicecart/features/rn-feature-*`; routes under `apps/voicecart/src/app` only mount screens.
 
 ## Screen inventory
 

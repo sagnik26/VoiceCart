@@ -1,0 +1,10 @@
+{
+  "app": {
+    "components": "../../core/modules/rn-ui/src/ui",
+    "entry": "src/app/_layout.tsx"
+  },
+  "tailwind": {
+    "config": "tailwind.config.js",
+    "css": "globals.css"
+  }
+}

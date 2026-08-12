@@ -107,7 +107,7 @@ Most of the end-to-end response time is inherent to the STT, LLM, and TTS models
 
 ## 5. What still needs to be built
 
-Phased, independently testable build order (start with level metering): [`.cursor/plans/voice-loop-build-phases.md`](../.cursor/plans/voice-loop-build-phases.md).
+Phased, independently testable build order (start with level metering): [`docs/voice-loop-build-phases.md`](./voice-loop-build-phases.md).
 
 - **LiveKit agent (server) application code:** `AgentSession` configuration, VoiceCart ordering prompt/tools (Food MCP search + build cart only), conversation state, logging, and turn tuning (e.g. silence tolerance before end-of-turn).
 - **React Native app (client):** Talk screens, LiveKit room/track integration, mic level animation driven by SDK audio-level events, transcript/chips, disambiguation UI, and connection-state UX.

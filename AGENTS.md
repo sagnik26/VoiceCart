@@ -9,7 +9,7 @@ For any non-trivial change, share a plan and get confirmation before writing cod
 3. **Wait for the human to confirm or adjust the plan before implementing.** The design decision is theirs.
 4. Take extra care — surface the impact explicitly in the plan — when the change adds a third-party dependency, changes a public API or exported type, changes a persisted-storage schema (SQLite, encrypted storage, cache), introduces a pattern not already used in the codebase, or touches app-boot or auth flows.
 5. Implement the confirmed plan, following the guidelines for the files you touch (see Guideline Index).
-6. Before calling the work done: write unit tests per the Tests guideline, and run `pnpm type:check`, `pnpm lint`, and `pnpm unit` (when those scripts exist for the touched package).
+6. Before calling the work done: write unit tests per the Tests guideline, and run `npm run type:check`, `npm run lint`, and `npm run unit` (when those scripts exist for the touched package).
 
 Trivial changes (a small fix, a copy tweak, a rename) do not need a plan — just make them.
 
@@ -26,8 +26,7 @@ VoiceCart is a voice-first food ordering app (India, iOS + Android). Product sco
 | [`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md) | Visual tokens, navigation/IA notes, implemented screen map for the Expo UI |
 | [`docs/voice-app-architecture.md`](docs/voice-app-architecture.md) | Talk voice loop architecture — LiveKit (WebRTC) + Sarvam STT/TTS + OpenAI LLM agent |
 | [`docs/assets/voice-app-architecture/`](docs/assets/voice-app-architecture/) | Architecture diagram asset for the voice stack |
-| [`docs/implementation/README.md`](docs/implementation/README.md) | Implementation guide hub — build order (phases A–F) and links to all feature docs |
-| [`docs/implementation/voice-ordering.md`](docs/implementation/voice-ordering.md) | Voice ordering — LiveKit client/agent, disambiguation, typed = same session, cart handoff |
+| [`docs/implementation/voice-ordering.md`](docs/implementation/voice-ordering.md) | Voice ordering product wiring — chips, disambiguation, typed = same session, cart handoff |
 | [`docs/implementation/swiggy-mcp-food.md`](docs/implementation/swiggy-mcp-food.md) | Swiggy Builders Club MCP (Food) — search, cart, place, status |
 | [`docs/implementation/swiggy-mcp-instamart.md`](docs/implementation/swiggy-mcp-instamart.md) | Swiggy MCP (Instamart) — Kitchen and routine grocery carts |
 | [`docs/implementation/kitchen.md`](docs/implementation/kitchen.md) | Kitchen — dish → ingredients, Need/Have, extras (pantry, substitutions) |
@@ -45,7 +44,7 @@ VoiceCart is a voice-first food ordering app (India, iOS + Android). Product sco
 
 ## Project Structure & Module Organization
 
-This repo is a **pnpm** monorepo containing React Native / Expo applications and shared modules:
+This repo is an **npm workspaces** monorepo containing React Native / Expo applications and shared modules:
 
 ### Top-Level Structure
 
@@ -58,7 +57,7 @@ This repo is a **pnpm** monorepo containing React Native / Expo applications and
   - `common/tools/` - Shared development tools
 - `docs/` - Product, architecture, design system, and implementation guides (see [Documentation](#documentation-index))
 - `tests/e2e/` - End-to-end tests
-- `pnpm-workspace.yaml` - Workspace package globs (`apps/*`, `core/modules/*`) and `nodeLinker`
+- Root `package.json` - Declares npm `workspaces` globs (`apps/*`, `apps/*/features/*`, `apps/*/core/*`, `core/modules/*`)
 
 
 
@@ -99,7 +98,8 @@ This repo is a **pnpm** monorepo containing React Native / Expo applications and
   - Shared Core modules can have UI components or business logic, should not mix them
   - Shared Core modules should not have a screen code so that it should not depend on react-navigation
 - Main application code should be kept to a minimum and serve as an integration layer for Feature modules besides sign in/out and application lifecycle
-- Use the pnpm workspace defined in root `pnpm-workspace.yaml` (root `package.json` proxies scripts with `pnpm --filter`)
+- Use the npm workspaces defined in the root `package.json` (root scripts proxy with `npm run … -w <package>` / `npm run … --workspaces`)
+- Do **not** add `pnpm-workspace.yaml` or switch to pnpm for this repo unless explicitly decided later
 - Adding a dependency has strict placement rules (the module's own `package.json` and the app-root `package.json`, updated together), and third-party OSS packages need an IP-notice regeneration, the OSS Update label, and license review. Follow the Dependencies and OSS guidelines in the Guideline Index before changing dependencies.
 - When proposing, writing, or reviewing architecture-relevant changes, MUST use `Non-functional Requirements` as guiding principles. Identify the affected NFRs, relevant requirement horizons, and important tradeoffs when the change affects architecture, dependencies, platform capabilities, release behavior, telemetry, experimentation, developer workflows, or cross-module patterns.
 
@@ -212,7 +212,7 @@ This repo is a **pnpm** monorepo containing React Native / Expo applications and
 ### Security Best Practices
 
 - Validate all user input
-- Run `pnpm ip-notice:check` to verify open source compliance (when that script exists)
+- Run `npm run ip-notice:check` to verify open source compliance (when that script exists)
 - Follow the principle of least privilege for access control
 - Store sensitive data encrypted at rest and in transit
 - Review security advisories regularly for dependencies

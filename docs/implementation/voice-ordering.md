@@ -1,17 +1,20 @@
 # Voice ordering
 
 **PRD:** §3 Voice ordering, §6.1, screens 7–9.  
-**Architecture:** [`../voice-app-architecture.md`](../voice-app-architecture.md) — LiveKit (WebRTC) · Sarvam STT/TTS · OpenAI LLM agent.
+**Architecture (spine):** [`../voice-app-architecture.md`](../voice-app-architecture.md) — LiveKit · Sarvam STT/TTS · OpenAI agent.  
+**Build order:** [`../voice-loop-build-phases.md`](../voice-loop-build-phases.md) — independently testable phases 0–9.
 
 **Depends on:** [Swiggy MCP — Food](./swiggy-mcp-food.md), LiveKit Cloud/self-hosted room + agent worker  
 **Related:** [Cross-cutting states and rules](./cross-cutting-states-and-rules.md), [Kitchen](./kitchen.md) (shared LiveKit client)
 
+This doc is VoiceCart **product wiring** for Talk — what the UI and agent tools must do. Transport, models, turn flow, and latency live in the architecture doc; phased implementation gates live in the build-phases doc.
+
 ## Current state
 
-- `src/app/voice.tsx` — timed mock phases (listen → think → speak), local orb animation, keyboard toggle, Show cart.
-- Recognised items are list rows from `voice-mock.ts`, not live transcript chips.
+- `@voicecart/rn-feature-voice` — Talk + Disambiguation screens; `@voicecart/rn-feature-voice-core` holds mock timeline / list data.
+- App route `apps/voicecart/src/app/voice.tsx` is a thin mount of `VoiceScreen`.
 - Typed text does not feed an agent or cart.
-- `src/app/disambiguation.tsx` is a placeholder.
+- Disambiguation is still a placeholder screen.
 - No LiveKit room, mic permission wiring, Sarvam, or OpenAI agent session.
 
 ## Target behaviour (product)
@@ -21,46 +24,10 @@
 3. As the agent understands items, show chips (not only a final list).
 4. Ambiguity → spoken clarification (Sarvam TTS) **and** Disambiguation UI with ≤3 named options (price/restaurant) + “None of these”.
 5. When a cart is ready, Show cart → same Cart review as other entry points.
-6. Typed input enters the **same** agent session as voice (PRD: typed = voice pipeline).
-7. Agent **never** places the order — only builds/proposes a cart; user taps Place order on Cart review.
+6. Typed input enters the **same** agent session as voice (PRD: typed = voice pipeline). Do not maintain a separate client-side parser.
+7. Agent **never** places the order — only builds/proposes a cart; user taps Place order on Cart review. Agent tools: Food MCP search + `buildCart` only (`placeOrder` is not an agent tool).
 
-## Architecture mapping
-
-VoiceCart Talk uses the three-tier stack in the architecture doc, with ordering-specific agent tools:
-
-| Tier | Role in VoiceCart |
-| --- | --- |
-| **Device** (`@livekit/react-native`) | Mic/playback, AEC, reconnection, audio levels → orb/waveform; transcript + chips + connection UX; no raw audio in JS |
-| **Transport** (LiveKit room / WebRTC) | Bidirectional audio; replace any direct Sarvam WebSocket from the app |
-| **LiveKit Agent** | `AgentSession`: Sarvam STT → OpenAI LLM → Sarvam TTS; `turn_detection="stt"`; barge-in cancels in-flight TTS |
-| **External AI** | Saaras v3 (STT + VAD), GPT (streaming reply), Bulbul v3 (TTS) |
-| **Commerce tools** | Agent tools call Swiggy Food MCP (search / build cart). `placeOrder` is **not** an agent tool |
-
-Reference agent config (from architecture; models may be pinned in env):
-
-```python
-session = AgentSession(
-    stt=sarvam.STT(model="saaras:v3", mode="transcribe", flush_signal=True),
-    llm=openai.LLM(model="gpt-5.6-terra"),
-    tts=sarvam.TTS(model="bulbul:v3", target_language_code="en-IN", speaker="shubh"),
-    turn_detection="stt",
-)
-```
-
-### End-to-end ordering turn
-
-1. Native mic (LiveKit SDK) → WebRTC → LiveKit room.
-2. Agent forwards audio → Sarvam STT; partials update UI transcript; final transcript ends the user turn.
-3. LLM interprets the order, may call Food MCP tools, may ask a clarifying question (TTS + Disambiguation screen via data channel / agent event).
-4. Reply streams token → sentence chunks → Sarvam TTS → published to room → device playback (jitter buffer).
-5. Barge-in: new user speech while TTS plays → agent cancels TTS; device flushes playback.
-6. On complete cart proposal, client enables Show cart; Place order remains cart-only.
-
-### Typed path
-
-Keyboard toggle injects text into the same `AgentSession` (e.g. `session.generate_reply` / text input API), so search, clarification, and cart tools stay identical to spoken turns. Do not maintain a separate client-side parser.
-
-## Implementation
+## Implementation notes
 
 | Layer | Responsibility |
 | --- | --- |
@@ -77,13 +44,9 @@ Keyboard toggle injects text into the same `AgentSession` (e.g. `session.generat
 - Agent worker package (Python or Node) with Sarvam + OpenAI plugins and Swiggy Food tool adapters.
 - Voice feature screens consuming room + agent data events.
 
-**Key files to evolve:** `voice.tsx` (replace mock RAF timeline with LiveKit session), orb driven by track levels, `recognized-list.tsx` → chips from agent events, `disambiguation.tsx`, retire `voice-mock.ts` timeline once live.
+**Key files to evolve:** `@voicecart/rn-feature-voice` (replace mock RAF timeline with LiveKit session), orb driven by track levels, recognized list → chips from agent events, disambiguation screen; retire voice-core mock timeline once live.
 
-**Still to build (architecture §5, VoiceCart-scoped):**
-
-- Agent application code: prompts, ordering tools, barge-in behaviour, logging.
-- Client: LiveKit integration on Talk (+ Kitchen reuse), transcript/chips, connection UX.
-- Supporting backend as needed: token minting, accounts — outside the live voice loop.
+Update **Current state** after each build phase that lands.
 
 ## Acceptance checks
 
@@ -95,7 +58,7 @@ Keyboard toggle injects text into the same `AgentSession` (e.g. `session.generat
 
 ## Risks
 
-- End-to-end latency is dominated by STT + LLM + TTS (architecture §4.3); stream at every stage and avoid extra hops on the client.
+- End-to-end latency is dominated by STT + LLM + TTS ([architecture §4.3](../voice-app-architecture.md#43-latency-budget)); stream at every stage and avoid extra hops on the client.
 - LiveKit + Expo/dev-client native deps; plan a custom dev client / EAS build (not Expo Go–only).
 - Agent tool design must keep commerce failures visible (hide ordering entry points when Swiggy unavailable — PRD).
 - Public-space noise → typed injection into the agent must remain first-class.
