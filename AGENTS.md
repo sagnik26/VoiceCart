@@ -15,12 +15,33 @@ Trivial changes (a small fix, a copy tweak, a rename) do not need a plan — jus
 
 ## Product
 
-VoiceCart is a voice-first food ordering app (India, iOS + Android). Product scope, screens, flows, and rules are defined in:
+VoiceCart is a voice-first food ordering app (India, iOS + Android). Product scope, screens, flows, and rules are defined in the PRD (v1.1 is current). Do not invent features outside that PRD’s v1 scope without asking.
 
-- [`docs/PRD-Voice-Food-Ordering-App.md`](docs/PRD-Voice-Food-Ordering-App.md)
-- Figures: [`docs/assets/PRD-Voice-Food-Ordering-App/`](docs/assets/PRD-Voice-Food-Ordering-App/)
+### Documentation
 
-Do not invent features outside that PRD’s v1 scope without asking.
+| Document | Relates to |
+| --- | --- |
+| [`docs/PRD-Voice-Food-Ordering-App.md`](docs/PRD-Voice-Food-Ordering-App.md) | **PRD (v1.1)** — features, IA, product rules, flows, screen specs, Track (spend + calories), monetisation, integrations |
+| [`docs/assets/PRD-Voice-Food-Ordering-App/`](docs/assets/PRD-Voice-Food-Ordering-App/) | PRD wireframe figures (IA, voice, Kitchen, Home/Track, insights) |
+| [`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md) | Visual tokens, navigation/IA notes, implemented screen map for the Expo UI |
+| [`docs/voice-app-architecture.md`](docs/voice-app-architecture.md) | Talk voice loop architecture — LiveKit (WebRTC) + Sarvam STT/TTS + OpenAI LLM agent |
+| [`docs/assets/voice-app-architecture/`](docs/assets/voice-app-architecture/) | Architecture diagram asset for the voice stack |
+| [`docs/implementation/README.md`](docs/implementation/README.md) | Implementation guide hub — build order (phases A–F) and links to all feature docs |
+| [`docs/implementation/voice-ordering.md`](docs/implementation/voice-ordering.md) | Voice ordering — LiveKit client/agent, disambiguation, typed = same session, cart handoff |
+| [`docs/implementation/swiggy-mcp-food.md`](docs/implementation/swiggy-mcp-food.md) | Swiggy Builders Club MCP (Food) — search, cart, place, status |
+| [`docs/implementation/swiggy-mcp-instamart.md`](docs/implementation/swiggy-mcp-instamart.md) | Swiggy MCP (Instamart) — Kitchen and routine grocery carts |
+| [`docs/implementation/kitchen.md`](docs/implementation/kitchen.md) | Kitchen — dish → ingredients, Need/Have, extras (pantry, substitutions) |
+| [`docs/implementation/track.md`](docs/implementation/track.md) | Track — spend/calorie ledgers, limits, Home status, cart impact |
+| [`docs/implementation/calorie-estimation.md`](docs/implementation/calorie-estimation.md) | Calorie estimation source for Track and cart impact |
+| [`docs/implementation/suggestions.md`](docs/implementation/suggestions.md) | Home suggestions ranker (history, time, Track headroom) |
+| [`docs/implementation/track-insights.md`](docs/implementation/track-insights.md) | Track insights — monthly read-only reporting (paid) |
+| [`docs/implementation/reorder.md`](docs/implementation/reorder.md) | One-tap reorder from recent/history → cart review |
+| [`docs/implementation/routine-instamart-list.md`](docs/implementation/routine-instamart-list.md) | Standing Instamart grocery list on restock day |
+| [`docs/implementation/revenuecat-monetisation.md`](docs/implementation/revenuecat-monetisation.md) | RevenueCat — free vs paid, paywall, entitlements |
+| [`docs/implementation/onboarding-profile.md`](docs/implementation/onboarding-profile.md) | Onboarding (OTP, Swiggy link) and Profile vs Settings IA |
+| [`docs/implementation/cross-cutting-states-and-rules.md`](docs/implementation/cross-cutting-states-and-rules.md) | Product rules enforcement + empty/error/permission states |
+| [`docs/implementation/open-decisions.md`](docs/implementation/open-decisions.md) | Open product/engineering decisions still to lock |
+| [`docs/implementation/appendix-screen-map.md`](docs/implementation/appendix-screen-map.md) | PRD screen ↔ feature map and integration risk summary |
 
 ## Project Structure & Module Organization
 
@@ -35,7 +56,7 @@ This repo is a **pnpm** monorepo containing React Native / Expo applications and
 - `common/` - Common tooling and configurations
   - `common/ci/` - CI/CD scripts and tools
   - `common/tools/` - Shared development tools
-- `docs/` - Documentation (PRD and figures under `docs/` / `docs/assets/`)
+- `docs/` - Product, architecture, design system, and implementation guides (see [Documentation](#documentation-index))
 - `tests/e2e/` - End-to-end tests
 - `pnpm-workspace.yaml` - Workspace package globs (`apps/*`, `core/modules/*`) and `nodeLinker`
 
