@@ -6,6 +6,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -15,6 +16,8 @@ import type { VoiceOrbState } from '@voicecart/rn-feature-voice-core';
 
 type VoiceOrbProps = {
   state: VoiceOrbState;
+  /** 0–1 mic energy. When set, listening blobs follow live volume instead of the mock loop. */
+  level?: number;
 };
 
 function WaveIcon() {
@@ -40,7 +43,7 @@ function DotsIcon() {
   );
 }
 
-export function VoiceOrb({ state }: VoiceOrbProps) {
+export function VoiceOrb({ state, level }: VoiceOrbProps) {
   const phaseA = useSharedValue(0);
   const phaseB = useSharedValue(0);
   const corePulse = useSharedValue(0);
@@ -49,11 +52,22 @@ export function VoiceOrb({ state }: VoiceOrbProps) {
   const ripple2 = useSharedValue(0);
   const thinkingOn = useSharedValue(0);
   const speakingOn = useSharedValue(0);
+  const liveMode = useSharedValue(0);
+  const liveLevel = useSharedValue(0);
 
   useEffect(() => {
     thinkingOn.value = state === 'thinking' ? 1 : 0;
     speakingOn.value = state === 'speaking' ? 1 : 0;
   }, [speakingOn, state, thinkingOn]);
+
+  useEffect(() => {
+    liveMode.value = level == null ? 0 : 1;
+    if (level == null) {
+      liveLevel.value = 0;
+      return;
+    }
+    liveLevel.value = withSpring(level, { damping: 16, stiffness: 160, mass: 0.4 });
+  }, [level, liveLevel, liveMode]);
 
   useEffect(() => {
     const values = [phaseA, phaseB, corePulse, spin, ripple1, ripple2];
@@ -97,6 +111,13 @@ export function VoiceOrb({ state }: VoiceOrbProps) {
   }, [corePulse, phaseA, phaseB, ripple1, ripple2, spin]);
 
   const blobAStyle = useAnimatedStyle(() => {
+    if (liveMode.value > 0.5) {
+      const a = liveLevel.value;
+      return {
+        opacity: 0.1 + a * 0.42,
+        transform: [{ scaleX: 0.92 + a * 0.42 }, { scaleY: 0.92 + a * 0.32 }],
+      };
+    }
     const a = phaseA.value;
     return {
       opacity: 0.45 - a * 0.37,
@@ -105,6 +126,13 @@ export function VoiceOrb({ state }: VoiceOrbProps) {
   });
 
   const blobBStyle = useAnimatedStyle(() => {
+    if (liveMode.value > 0.5) {
+      const b = liveLevel.value;
+      return {
+        opacity: 0.08 + b * 0.36,
+        transform: [{ scaleX: 0.94 + b * 0.28 }, { scaleY: 0.94 + b * 0.22 }],
+      };
+    }
     const b = phaseB.value;
     return {
       opacity: 0.4 - b * 0.34,
@@ -142,6 +170,14 @@ export function VoiceOrb({ state }: VoiceOrbProps) {
   });
 
   const coreStyle = useAnimatedStyle(() => {
+    if (liveMode.value > 0.5) {
+      const a = liveLevel.value;
+      return {
+        transform: [{ scale: 1 + a * 0.12 }],
+        shadowOpacity: 0.45 + a * 0.35,
+        shadowRadius: 12 + a * 10,
+      };
+    }
     const pulse =
       1 +
       corePulse.value * (speakingOn.value > 0.5 ? 0.04 : 0.05);

@@ -33,6 +33,27 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
+      ],
+      [
+        "@livekit/react-native-expo-plugin",
+        {
+          "android": {
+            "audioType": "communication"
+          }
+        }
+      ],
+      [
+        "@config-plugins/react-native-webrtc",
+        {
+          "microphonePermission": "VoiceCart uses the microphone so you can place orders by voice."
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "VoiceCart uses the microphone so you can place orders by voice.",
+          "recordAudioAndroid": true
+        }
       ]
     ],
     "experiments": {

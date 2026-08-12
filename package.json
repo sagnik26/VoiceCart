@@ -14,7 +14,8 @@
     "ios": "npm run ios -w voicecart",
     "web": "npm run web -w voicecart",
     "lint": "npm run lint -w voicecart",
-    "type:check": "npm run type:check -w voicecart"
+    "type:check": "npm run type:check -w voicecart",
+    "token:livekit": "npm run token:livekit -w voicecart"
   },
   "engines": {
     "node": ">=20"

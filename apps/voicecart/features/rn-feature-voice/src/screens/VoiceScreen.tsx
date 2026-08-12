@@ -4,6 +4,8 @@ import { TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FullListSheet } from '../components/full-list-sheet';
+import { LiveListeningMeter, LiveTalkSession } from '../components/live-talk-session';
+import { MicNeeded } from '../components/mic-needed';
 import { RecognizedList } from '../components/recognized-list';
 import { ShowCartButton } from '../components/show-cart-button';
 import { VoiceHeader } from '../components/voice-header';
@@ -13,8 +15,11 @@ import { Text } from '@voicecart/rn-ui';
 import { VStack } from '@voicecart/rn-ui';
 import { Brand } from '@voicecart/rn-theme';
 import {
+  isLiveMeteringEnabled,
+  micPermissionLabel,
   orbLabel,
   snapshotAtElapsed,
+  useMicPermission,
   type VoiceOrbState,
   type VoicePhase,
 } from '@voicecart/rn-feature-voice-core';
@@ -30,6 +35,10 @@ export function VoiceScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { isDark } = useThemeMode();
+  const { status: micStatus, isRequesting, request } = useMicPermission();
+  const micReady = micStatus === 'granted';
+  const liveMeteringEnabled = useMemo(() => isLiveMeteringEnabled(), []);
+  const useLivePath = liveMeteringEnabled && micReady;
 
   const [phase, setPhase] = useState<VoicePhase>('listening');
   const [visibleCount, setVisibleCount] = useState(0);
@@ -55,6 +64,10 @@ export function VoiceScreen() {
   }, []);
 
   useEffect(() => {
+    if (!micReady || useLivePath) {
+      return;
+    }
+
     elapsedRef.current = 0;
     lastFrameRef.current = null;
 
@@ -73,10 +86,10 @@ export function VoiceScreen() {
       cancelAnimationFrame(frameId);
       lastFrameRef.current = null;
     };
-  }, [applySnapshot]);
+  }, [applySnapshot, micReady, useLivePath]);
 
   const orbState = useMemo(() => phaseToOrb(phase), [phase]);
-  const cartEnabled = phase === 'speaking';
+  const cartEnabled = micReady && !useLivePath && phase === 'speaking';
   const textColor = isDark ? Brand.surface : Brand.ink;
 
   const onCancel = () => {
@@ -92,6 +105,32 @@ export function VoiceScreen() {
     router.push('/cart');
   };
 
+  const bottomChrome = (
+    <VStack space="md" className="w-full">
+      {keyboardOpen ? (
+        <TextInput
+          value={typedOrder}
+          onChangeText={setTypedOrder}
+          placeholder="Type your order instead…"
+          placeholderTextColor={Brand.muted}
+          className="rounded-lg border border-border bg-card px-3.5 py-3 text-[14px]"
+          style={{ color: textColor }}
+          returnKeyType="done"
+          accessibilityLabel="Type your order"
+        />
+      ) : null}
+
+      <View>
+        <RecognizedList
+          visibleCount={useLivePath ? 0 : micReady ? visibleCount : 0}
+          onSeeFullList={() => setSheetOpen(true)}
+        />
+      </View>
+
+      <ShowCartButton enabled={cartEnabled} onPress={onShowCart} />
+    </VStack>
+  );
+
   return (
     <Box className="flex-1 bg-background" style={{ paddingTop: insets.top + 8 }}>
       <VStack
@@ -104,39 +143,36 @@ export function VoiceScreen() {
           keyboardOpen={keyboardOpen}
         />
 
-        <VStack className="flex-1 items-center justify-center gap-5 py-4">
-          <VoiceOrb state={orbState} />
-          <Text
-            size="sm"
-            className="font-semibold uppercase tracking-widest text-muted-foreground"
-          >
-            {orbLabel(orbState)}
-          </Text>
-        </VStack>
-
-        <VStack space="md" className="w-full">
-          {keyboardOpen ? (
-            <TextInput
-              value={typedOrder}
-              onChangeText={setTypedOrder}
-              placeholder="Type your order instead…"
-              placeholderTextColor={Brand.muted}
-              className="rounded-lg border border-border bg-card px-3.5 py-3 text-[14px]"
-              style={{ color: textColor }}
-              returnKeyType="done"
-              accessibilityLabel="Type your order"
-            />
-          ) : null}
-
-          <View>
-            <RecognizedList
-              visibleCount={visibleCount}
-              onSeeFullList={() => setSheetOpen(true)}
-            />
-          </View>
-
-          <ShowCartButton enabled={cartEnabled} onPress={onShowCart} />
-        </VStack>
+        {micStatus === 'denied' ? (
+          <MicNeeded onAllow={() => void request()} isRequesting={isRequesting} />
+        ) : useLivePath ? (
+          <LiveTalkSession>
+            <LiveListeningMeter />
+            {bottomChrome}
+          </LiveTalkSession>
+        ) : (
+          <>
+            <VStack className="flex-1 items-center justify-center gap-5 py-4">
+              <VoiceOrb state={micReady ? orbState : 'listening'} />
+              <Text
+                size="sm"
+                className="font-semibold uppercase tracking-widest text-muted-foreground"
+              >
+                {micReady ? orbLabel(orbState) : micPermissionLabel(micStatus)}
+              </Text>
+              {micReady ? (
+                <Text
+                  size="xs"
+                  className="text-muted-foreground"
+                  accessibilityLabel="Microphone permission granted"
+                >
+                  {micPermissionLabel('granted')}
+                </Text>
+              ) : null}
+            </VStack>
+            {bottomChrome}
+          </>
+        )}
       </VStack>
 
       <FullListSheet open={sheetOpen} onClose={() => setSheetOpen(false)} />

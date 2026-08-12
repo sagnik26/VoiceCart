@@ -8,7 +8,7 @@ Packages after npm workspace carve. Update when packages are added or screens la
 | --- | --- | --- |
 | `@voicecart/rn-feature-home` | `@voicecart/rn-feature-home-core` | Home tab |
 | `@voicecart/rn-feature-kitchen` | `@voicecart/rn-feature-kitchen-core` | Kitchen + Ingredients |
-| `@voicecart/rn-feature-voice` | `@voicecart/rn-feature-voice-core` | Talk + Disambiguation |
+| `@voicecart/rn-feature-voice` | `@voicecart/rn-feature-voice-core` | Talk + Disambiguation; core owns mocks, `useMicPermission`, live-metering flag/token fetch |
 | `@voicecart/rn-feature-cart` | `@voicecart/rn-feature-cart-core` | Cart review; depends on home-core + kitchen-core for mocks |
 | `@voicecart/rn-feature-history` | `@voicecart/rn-feature-history-core` | Order history |
 | `@voicecart/rn-feature-order-status` | `@voicecart/rn-feature-order-status-core` | Thin core re-exports order helpers from cart-core |

@@ -18,6 +18,8 @@
     "react": "*",
     "react-native": "*",
     "react-native-reanimated": "*",
-    "react-native-safe-area-context": "*"
+    "react-native-safe-area-context": "*",
+    "@livekit/react-native": "*",
+    "livekit-client": "*"
   }
 }

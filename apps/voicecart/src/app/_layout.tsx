@@ -8,6 +8,8 @@ import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-rean
 import { AnimatedSplashOverlay, GluestackUIProvider } from '@voicecart/rn-ui';
 import { Colors, ThemeModeProvider, useThemeMode } from '@voicecart/rn-theme';
 
+import { setupLiveKit } from '../livekit-setup';
+
 // Pressto reads shared values when rebuilding animated styles on re-render.
 // Strict mode only warns; disable it for this known third-party pattern.
 configureReanimatedLogger({
@@ -15,6 +17,7 @@ configureReanimatedLogger({
   strict: false,
 });
 
+setupLiveKit();
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {

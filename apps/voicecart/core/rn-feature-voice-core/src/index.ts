@@ -10,3 +10,15 @@ export {
   type VoicePhase,
   type VoiceTimelineSnapshot,
 } from './voice-mock';
+export {
+  mapRecordingPermission,
+  micPermissionLabel,
+  useMicPermission,
+  type MicPermissionStatus,
+} from './mic-permission';
+export {
+  fetchLiveKitConnection,
+  isLiveMeteringEnabled,
+  mapTrackVolumeToOrbLevel,
+  type LiveKitConnection,
+} from './live-metering';
