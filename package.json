@@ -6,7 +6,8 @@
     "apps/*",
     "apps/*/features/*",
     "apps/*/core/*",
-    "core/modules/*"
+    "core/modules/*",
+    "services/*"
   ],
   "scripts": {
     "start": "npm run start -w voicecart",
@@ -15,7 +16,10 @@
     "web": "npm run web -w voicecart",
     "lint": "npm run lint -w voicecart",
     "type:check": "npm run type:check -w voicecart",
-    "token:livekit": "npm run token:livekit -w voicecart"
+    "token:livekit": "npm run token:livekit -w voicecart",
+    "publish:livekit-audio": "npm run publish:livekit-audio -w voicecart",
+    "agent": "npm run dev -w @voicecart/talk-agent",
+    "agent:setup": "npm run setup -w @voicecart/talk-agent"
   },
   "engines": {
     "node": ">=20"

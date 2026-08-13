@@ -40,6 +40,20 @@ export function orbLabel(state: VoiceOrbState): string {
   }
 }
 
+/**
+ * Maps LiveKit voice-assistant `state` strings. Core stays LiveKit-free.
+ * Unknown / connecting / listening all show the listening orb.
+ */
+export function mapAgentSessionState(state: string): VoiceOrbState {
+  if (state === 'thinking') {
+    return 'thinking';
+  }
+  if (state === 'speaking') {
+    return 'speaking';
+  }
+  return 'listening';
+}
+
 export const VOICE_CAPTURE_TOTAL_MS =
   VOICE_SCENE_MS.listening + VOICE_SCENE_MS.understanding + VOICE_SCENE_MS.thinking;
 

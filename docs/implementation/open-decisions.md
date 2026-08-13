@@ -20,7 +20,7 @@ Resolve before or during the matching implementation phase. Cross-links point at
 6. **LiveKit hosting:** LiveKit Cloud vs self-hosted; token-minting service ownership.  
    → [Voice ordering](./voice-ordering.md), [`../voice-app-architecture.md`](../voice-app-architecture.md)
 
-7. **Agent runtime:** Python vs Node LiveKit Agents worker for VoiceCart ordering tools.  
+7. **Agent runtime:** Python LiveKit Agents worker (`services/talk-agent`, npm workspace `@voicecart/talk-agent` for scripts only). Node Agents SDK is a later swap if we want one language.  
    → [Voice ordering](./voice-ordering.md)
 
 8. **Kitchen voice path:** full LiveKit agent session vs STT-only / lighter session for dish + pantry capture.  

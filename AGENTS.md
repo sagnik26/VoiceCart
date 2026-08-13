@@ -25,6 +25,7 @@ VoiceCart is a voice-first food ordering app (India, iOS + Android). Product sco
 | [`docs/assets/PRD-Voice-Food-Ordering-App/`](docs/assets/PRD-Voice-Food-Ordering-App/) | PRD wireframe figures (IA, voice, Kitchen, Home/Track, insights) |
 | [`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md) | Visual tokens, navigation/IA notes, implemented screen map for the Expo UI |
 | [`docs/voice-app-architecture.md`](docs/voice-app-architecture.md) | Talk voice loop architecture — LiveKit (WebRTC) + Sarvam STT/TTS + OpenAI LLM agent |
+| [`docs/voice-loop-flow.md`](docs/voice-loop-flow.md) | Simple Talk turn: mic → STT → LLM → TTS → speaker; how the Python worker is dispatched |
 | [`docs/assets/voice-app-architecture/`](docs/assets/voice-app-architecture/) | Architecture diagram asset for the voice stack |
 | [`docs/implementation/voice-ordering.md`](docs/implementation/voice-ordering.md) | Voice ordering product wiring — chips, disambiguation, typed = same session, cart handoff |
 | [`docs/implementation/swiggy-mcp-food.md`](docs/implementation/swiggy-mcp-food.md) | Swiggy Builders Club MCP (Food) — search, cart, place, status |
@@ -50,6 +51,7 @@ This repo is an **npm workspaces** monorepo containing React Native / Expo appli
 
 - `apps/` - Contains individual apps
   - `apps/voicecart/` - VoiceCart Expo app
+- `services/` - Non-Expo processes (`services/talk-agent` — Python LiveKit Agents worker; npm scripts only)
 - `core/` - Shared core modules used across apps
   - `core/modules/` - Individual shared workspace packages (`core/modules/*`)
 - `common/` - Common tooling and configurations

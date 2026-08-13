@@ -2,6 +2,7 @@
 
 **PRD:** §3 Voice ordering, §6.1, screens 7–9.  
 **Architecture (spine):** [`../voice-app-architecture.md`](../voice-app-architecture.md) — LiveKit · Sarvam STT/TTS · OpenAI agent.  
+**Simple flow:** [`../voice-loop-flow.md`](../voice-loop-flow.md) — mic → STT → LLM → TTS → speaker.  
 **Build order:** [`../voice-loop-build-phases.md`](../voice-loop-build-phases.md) — independently testable phases 0–9.
 
 **Depends on:** [Swiggy MCP — Food](./swiggy-mcp-food.md), LiveKit Cloud/self-hosted room + agent worker  
@@ -11,10 +12,12 @@ This doc is VoiceCart **product wiring** for Talk — what the UI and agent tool
 
 ## Current state
 
+- **Phase 4 (minimal voice agent):** A Python LiveKit Agents worker (`services/talk-agent`, `npm run agent`) joins `voicecart-talk-dev` as `voicecart-talk` (token mint dispatches it). Sarvam STT/TTS + OpenAI, fixed greet/acknowledge prompt, no tools. Talk waits for an agent participant (15s) then Failed + Try again if missing or if the agent leaves. The orb follows agent session state (listening / thinking / speaking); mic level still drives the listening pulse. Phase 3 speaker playback is unchanged. No transcripts, chips, Swiggy, or `placeOrder`.
+- **Phase 3 (remote audio playback):** Live Talk subscribes to remote audio in `voicecart-talk-dev` and routes output to the speaker (not earpiece). A live remote track shows “Hearing room audio”. Phase 1 local-mic metering is unchanged. Publish a test clip with `npm run publish:livekit-audio` (or LiveKit CLI) while Talk is Listening — not an agent voice.
 - **Phase 2 (room lifecycle):** Live Talk shows Connecting / Listening / Reconnecting / Failed + Try again, with a 15s connect timeout. Retry remounts the session (new token). LiveKit SDK reconnect stays mounted. Mic denied is still Phase 0. Show cart stays disabled on the live path. Phase 1 orb metering is unchanged. No agent, Sarvam, OpenAI, or Swiggy.
 - **Phase 1 (level metering):** Talk can join an empty LiveKit room and drive the orb from `useTrackVolume` when `EXPO_PUBLIC_VOICE_USE_LIVE_METERING=true` and a token mint (or smoke token) is configured. Cancel unmounts the room. Mock RAF timeline remains when the flag is off.
 - **Phase 0 (native foundation):** LiveKit RN SDK + WebRTC Expo plugins are in the app; `registerGlobals()` runs at boot. Talk requests the microphone via `useMicPermission`. Deny shows a Microphone needed empty state.
-- `@voicecart/rn-feature-voice` — Talk + Disambiguation screens; `@voicecart/rn-feature-voice-core` holds mocks, mic permission, live-metering config, and talk room status helpers.
+- `@voicecart/rn-feature-voice` — Talk + Disambiguation screens; `@voicecart/rn-feature-voice-core` holds mocks, mic permission, live-metering config, talk room status, remote-audio, and agent-presence helpers. `@voicecart/talk-agent` is the Python worker (scripts-only npm workspace).
 - App route `apps/voicecart/src/app/voice.tsx` is a thin mount of `VoiceScreen`.
 - Typed text does not feed an agent or cart.
 - Disambiguation is still a placeholder screen.

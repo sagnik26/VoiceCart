@@ -1,0 +1,10 @@
+{
+  "name": "@voicecart/talk-agent",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "python3 -m venv .venv && .venv/bin/pip install -U pip && .venv/bin/pip install -r requirements.txt",
+    "dev": "node ./run-agent.mjs dev",
+    "start": "node ./run-agent.mjs start"
+  }
+}

@@ -4,47 +4,18 @@
  *
  *   npm run token:livekit -w voicecart
  *
- * Loads apps/voicecart/.env.local (LIVEKIT_API_KEY, LIVEKIT_API_SECRET, LIVEKIT_URL).
+ * Loads repo-root .env.local (one env file for mint, app, and agent).
  */
 import { createServer } from 'node:http';
-import { existsSync, readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { AccessToken } from 'livekit-server-sdk';
+import { AccessToken, AgentDispatchClient, RoomAgentDispatch, RoomConfiguration } from 'livekit-server-sdk';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+import { loadRootEnv } from '../../../scripts/load-root-env.mjs';
+
+loadRootEnv();
+
 const PORT = Number(process.env.LIVEKIT_TOKEN_PORT ?? 8787);
 const ROOM_NAME = 'voicecart-talk-dev';
-
-function loadEnvFile(filePath) {
-  if (!existsSync(filePath)) {
-    return;
-  }
-  for (const raw of readFileSync(filePath, 'utf8').split('\n')) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#')) {
-      continue;
-    }
-    const eq = line.indexOf('=');
-    if (eq === -1) {
-      continue;
-    }
-    const key = line.slice(0, eq).trim();
-    let value = line.slice(eq + 1).trim();
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
-    }
-    if (process.env[key] === undefined) {
-      process.env[key] = value;
-    }
-  }
-}
-
-loadEnvFile(resolve(ROOT, '.env.local'));
-loadEnvFile(resolve(ROOT, '.env'));
+const AGENT_NAME = 'voicecart-talk';
 
 const apiKey = process.env.LIVEKIT_API_KEY;
 const apiSecret = process.env.LIVEKIT_API_SECRET;
@@ -52,9 +23,13 @@ const livekitUrl = process.env.LIVEKIT_URL ?? process.env.EXPO_PUBLIC_LIVEKIT_UR
 
 if (!apiKey || !apiSecret || !livekitUrl) {
   console.error(
-    'Missing LIVEKIT_API_KEY, LIVEKIT_API_SECRET, or LIVEKIT_URL in apps/voicecart/.env.local'
+    'Missing LIVEKIT_API_KEY, LIVEKIT_API_SECRET, or LIVEKIT_URL (repo-root .env.local)'
   );
   process.exit(1);
+}
+
+function livekitApiHost(url) {
+  return url.replace(/^wss:\/\//, 'https://').replace(/^ws:\/\//, 'http://');
 }
 
 async function mintToken() {
@@ -71,6 +46,21 @@ async function mintToken() {
     canPublishData: true,
     roomCreate: true,
   });
+  at.roomConfig = new RoomConfiguration({
+    agents: [new RoomAgentDispatch({ agentName: AGENT_NAME })],
+  });
+
+  // Token roomConfig only dispatches when the room is first created. This
+  // shared dev room already exists after Phase 1–3, so also dispatch explicitly.
+  try {
+    const dispatch = new AgentDispatchClient(livekitApiHost(livekitUrl), apiKey, apiSecret);
+    await dispatch.createDispatch(ROOM_NAME, AGENT_NAME);
+  } catch (err) {
+    console.warn(
+      `Agent dispatch skipped (${err instanceof Error ? err.message : err}). Is npm run agent running?`
+    );
+  }
+
   return at.toJwt();
 }
 
@@ -117,6 +107,7 @@ const server = createServer((req, res) => {
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`LiveKit token mint on http://127.0.0.1:${PORT}/token`);
   console.log(`Room: ${ROOM_NAME}`);
+  console.log(`Agent dispatch: ${AGENT_NAME}`);
   console.log('Emulator: EXPO_PUBLIC_LIVEKIT_TOKEN_URL=http://10.0.2.2:8787/token');
   console.log('Device:    EXPO_PUBLIC_LIVEKIT_TOKEN_URL=http://<LAN-IP>:8787/token');
 });

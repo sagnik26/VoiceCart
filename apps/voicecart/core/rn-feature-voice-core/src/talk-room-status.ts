@@ -1,10 +1,18 @@
 export const TALK_CONNECT_TIMEOUT_MS = 15_000;
 
+export const TALK_HEARING_ROOM_AUDIO_LABEL = 'Hearing room audio';
+
 export type TalkRoomStatus =
   | 'connecting'
   | 'connected'
   | 'reconnecting'
   | 'failed';
+
+export type RemoteAudioPresence = {
+  isLocal: boolean;
+  isAudio: boolean;
+  isSubscribed: boolean;
+};
 
 export function talkRoomStatusLabel(status: TalkRoomStatus): string {
   switch (status) {
@@ -17,6 +25,23 @@ export function talkRoomStatusLabel(status: TalkRoomStatus): string {
     case 'failed':
       return 'Could not connect';
   }
+}
+
+/** True when at least one subscribed remote audio track is present. */
+export function hasRemoteRoomAudio(
+  tracks: ReadonlyArray<RemoteAudioPresence>
+): boolean {
+  return tracks.some((track) => !track.isLocal && track.isAudio && track.isSubscribed);
+}
+
+/**
+ * LiveKit-free check for an agent participant. Protocol `Kind.AGENT` is 4.
+ */
+export function isAgentParticipantKind(kind: string | number): boolean {
+  if (kind === 4 || kind === '4') {
+    return true;
+  }
+  return typeof kind === 'string' && kind.toLowerCase() === 'agent';
 }
 
 /**

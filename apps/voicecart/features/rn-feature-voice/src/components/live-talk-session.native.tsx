@@ -1,21 +1,32 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Platform } from 'react-native';
 import {
+  AndroidAudioTypePresets,
   AudioSession,
   LiveKitRoom,
+  isTrackReference,
   useConnectionState,
   useLocalParticipant,
+  useRemoteParticipants,
   useTrackVolume,
+  useTracks,
+  useVoiceAssistant,
 } from '@livekit/react-native';
-import { ConnectionState, Track } from 'livekit-client';
+import { ConnectionState, RemoteTrackPublication, Track } from 'livekit-client';
 
 import { Box } from '@voicecart/rn-ui';
 import { Text } from '@voicecart/rn-ui';
 import { VStack } from '@voicecart/rn-ui';
 import {
   TALK_CONNECT_TIMEOUT_MS,
+  TALK_HEARING_ROOM_AUDIO_LABEL,
   fetchLiveKitConnection,
+  hasRemoteRoomAudio,
+  isAgentParticipantKind,
+  mapAgentSessionState,
   mapLiveKitConnectionState,
   mapTrackVolumeToOrbLevel,
+  orbLabel,
   talkRoomStatusLabel,
   type LiveKitConnection,
   type TalkRoomStatus,
@@ -23,6 +34,34 @@ import {
 
 import { TalkRoomFailed } from './talk-room-failed';
 import { VoiceOrb } from './voice-orb';
+
+async function startTalkAudioSession() {
+  await AudioSession.configureAudio({
+    android: {
+      preferredOutputList: ['speaker', 'headset', 'bluetooth', 'earpiece'],
+      audioTypeOptions: AndroidAudioTypePresets.communication,
+    },
+    ios: {
+      defaultOutput: 'speaker',
+    },
+  });
+  await AudioSession.startAudioSession();
+  await AudioSession.setDefaultRemoteAudioTrackVolume(1);
+  try {
+    const outputs = await AudioSession.getAudioOutputs();
+    const preferred =
+      Platform.OS === 'ios'
+        ? 'force_speaker'
+        : outputs.includes('speaker')
+          ? 'speaker'
+          : outputs[0];
+    if (preferred) {
+      await AudioSession.selectAudioOutput(preferred);
+    }
+  } catch {
+    // Speaker routing is best-effort; Talk still joins if the OS keeps earpiece.
+  }
+}
 
 type LiveTalkSessionProps = {
   children: ReactNode;
@@ -48,7 +87,7 @@ export function LiveTalkSession({ children }: LiveTalkSessionProps) {
 
     const start = async () => {
       try {
-        await AudioSession.startAudioSession();
+        await startTalkAudioSession();
         const next = await fetchLiveKitConnection();
         if (!cancelled) {
           setConnection(next);
@@ -104,6 +143,7 @@ export function LiveTalkSession({ children }: LiveTalkSessionProps) {
         audio
         video={false}
         connect
+        connectOptions={{ autoSubscribe: true }}
       >
         <TalkRoomBody onFatal={setError} onRecover={recover} onRetry={retry}>
           {children}
@@ -128,14 +168,27 @@ function TalkRoomBody({
 }: TalkRoomBodyProps) {
   const connectionState = useConnectionState();
   const roomStatus = useTalkRoomStatus(connectionState);
+  const remotes = useRemoteParticipants();
+  const agentPresent = remotes.some((participant) =>
+    isAgentParticipantKind(participant.kind)
+  );
   const [timedOut, setTimedOut] = useState(false);
+  const [agentTimedOut, setAgentTimedOut] = useState(false);
+  const [agentSeen, setAgentSeen] = useState(false);
 
   useEffect(() => {
-    if (roomStatus === 'connected' || roomStatus === 'reconnecting') {
-      setTimedOut(false);
+    if (agentPresent) {
+      setAgentSeen(true);
+      setAgentTimedOut(false);
       onRecover();
     }
-  }, [onRecover, roomStatus]);
+  }, [agentPresent, onRecover]);
+
+  useEffect(() => {
+    if (roomStatus === 'reconnecting') {
+      setTimedOut(false);
+    }
+  }, [roomStatus]);
 
   useEffect(() => {
     if (roomStatus !== 'connecting') {
@@ -149,12 +202,35 @@ function TalkRoomBody({
   }, [onFatal, roomStatus]);
 
   useEffect(() => {
+    if (roomStatus !== 'connected' || agentPresent) {
+      return;
+    }
+    const timeout = setTimeout(() => {
+      setAgentTimedOut(true);
+      onFatal('Timed out');
+    }, TALK_CONNECT_TIMEOUT_MS);
+    return () => clearTimeout(timeout);
+  }, [agentPresent, onFatal, roomStatus]);
+
+  useEffect(() => {
     if (roomStatus === 'failed') {
       onFatal('Disconnected');
     }
   }, [onFatal, roomStatus]);
 
-  const showFailed = roomStatus === 'failed' || timedOut;
+  useEffect(() => {
+    if (agentSeen && !agentPresent && roomStatus === 'connected') {
+      onFatal('Disconnected');
+    }
+  }, [agentPresent, agentSeen, onFatal, roomStatus]);
+
+  const waitingForAgent = roomStatus === 'connected' && !agentPresent;
+  const agentGone = agentSeen && !agentPresent && roomStatus === 'connected';
+  const showFailed =
+    roomStatus === 'failed' || timedOut || agentTimedOut || agentGone;
+  const meterStatus: TalkRoomStatus = waitingForAgent && !showFailed
+    ? 'connecting'
+    : roomStatus;
 
   if (showFailed) {
     return (
@@ -164,7 +240,7 @@ function TalkRoomBody({
 
   return (
     <>
-      <LiveListeningMeter roomStatus={roomStatus} />
+      <LiveListeningMeter roomStatus={meterStatus} />
       {children}
     </>
   );
@@ -195,7 +271,49 @@ export function LiveListeningMeter({ roomStatus }: LiveListeningMeterProps) {
   const mapped = mapLiveKitConnectionState(connectionState);
   const resolvedStatus = roomStatus ?? (mapped === 'failed' ? 'connecting' : mapped);
   const { localParticipant, microphoneTrack } = useLocalParticipant();
+  const { state: agentSessionState } = useVoiceAssistant();
   const connected = resolvedStatus === 'connected';
+  const orbState = connected ? mapAgentSessionState(agentSessionState) : 'listening';
+  const statusLabel =
+    connected && orbState !== 'listening'
+      ? orbLabel(orbState)
+      : talkRoomStatusLabel(resolvedStatus);
+  const roomTracks = useTracks(
+    [Track.Source.Microphone, Track.Source.Unknown],
+    { onlySubscribed: false }
+  );
+
+  useEffect(() => {
+    for (const track of roomTracks) {
+      if (!isTrackReference(track) || track.participant.isLocal) {
+        continue;
+      }
+      if (!(track.publication instanceof RemoteTrackPublication)) {
+        continue;
+      }
+      if (track.publication.kind !== Track.Kind.Audio) {
+        continue;
+      }
+      if (!track.publication.isSubscribed) {
+        track.publication.setSubscribed(true);
+      }
+    }
+  }, [roomTracks]);
+
+  const hearingRemote = hasRemoteRoomAudio(
+    roomTracks.flatMap((track) => {
+      if (!isTrackReference(track)) {
+        return [];
+      }
+      return [
+        {
+          isLocal: track.participant.isLocal,
+          isAudio: track.publication.kind === Track.Kind.Audio,
+          isSubscribed: track.publication.isSubscribed,
+        },
+      ];
+    })
+  );
 
   const trackRef = useMemo(() => {
     if (!microphoneTrack) {
@@ -210,16 +328,22 @@ export function LiveListeningMeter({ roomStatus }: LiveListeningMeterProps) {
 
   const volume = useTrackVolume(trackRef);
   const level = mapTrackVolumeToOrbLevel(volume);
+  const showMicLevel = connected && orbState === 'listening';
 
   return (
     <VStack className="flex-1 items-center justify-center gap-5 py-4">
-      <VoiceOrb state="listening" level={connected ? level : 0} />
+      <VoiceOrb state={orbState} level={showMicLevel ? level : undefined} />
       <Text
         size="sm"
         className="font-semibold uppercase tracking-widest text-muted-foreground"
       >
-        {talkRoomStatusLabel(resolvedStatus)}
+        {statusLabel}
       </Text>
+      {connected && orbState === 'listening' && hearingRemote ? (
+        <Text size="xs" className="text-center text-muted-foreground">
+          {TALK_HEARING_ROOM_AUDIO_LABEL}
+        </Text>
+      ) : null}
     </VStack>
   );
 }

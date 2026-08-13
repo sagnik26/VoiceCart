@@ -2,7 +2,7 @@
 
 Android (React Native) · LiveKit · Sarvam · OpenAI
 
-**VoiceCart:** This is the transport and agent spine for Talk (voice ordering). Product behaviour (chips, disambiguation, Show cart, agent never places orders) is specified in the PRD and [`implementation/voice-ordering.md`](./implementation/voice-ordering.md).
+**VoiceCart:** This is the transport and agent spine for Talk (voice ordering). Product behaviour (chips, disambiguation, Show cart, agent never places orders) is specified in the PRD and [`implementation/voice-ordering.md`](./implementation/voice-ordering.md). **Simple turn-by-turn flow:** [`voice-loop-flow.md`](./voice-loop-flow.md).
 
 ## 1. Overview
 

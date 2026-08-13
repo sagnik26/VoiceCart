@@ -4,6 +4,7 @@ export {
   VOICE_SCENE_MS,
   VOICE_CAPTURE_TOTAL_MS,
   orbLabel,
+  mapAgentSessionState,
   snapshotAtElapsed,
   type RecognizedItem,
   type VoiceOrbState,
@@ -24,7 +25,11 @@ export {
 } from './live-metering';
 export {
   TALK_CONNECT_TIMEOUT_MS,
+  TALK_HEARING_ROOM_AUDIO_LABEL,
+  hasRemoteRoomAudio,
+  isAgentParticipantKind,
   mapLiveKitConnectionState,
   talkRoomStatusLabel,
+  type RemoteAudioPresence,
   type TalkRoomStatus,
 } from './talk-room-status';
