@@ -67,7 +67,7 @@ Root Stack
 └── settings
 ```
 
-- Tab bar: Home · raised Talk · Kitchen (`@voicecart/rn-ui` `AppTabBar`).
+- Tab bar: Home · Talk · Kitchen (`@voicecart/rn-ui` `NotchAppTabBar`). The bar uses the app background (`Colors.dark.background`); its top edge is a single `border` hairline that runs straight, dips around the coral Talk button, then continues to Kitchen (no shadow on the button). Home and Kitchen highlight only their own icon: the Lottie is tinted `primary` when selected and `textSecondary` otherwise, plus a slight scale and a coral pill under the active icon. `AppTabBar` remains exported.
 - Talk calls `router.push('/voice')`; it is not a tab that keeps the bar.
 - Stack screens hide the tab bar by default.
 - Feature UI lives in `apps/voicecart/features/rn-feature-*`; routes under `apps/voicecart/src/app` only mount screens.

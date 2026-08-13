@@ -1,12 +1,12 @@
 import { Tabs } from 'expo-router';
 
-import { AppTabBar } from '@voicecart/rn-ui';
+import { NotchAppTabBar } from '@voicecart/rn-ui';
 import { Colors } from '@voicecart/rn-theme';
 
 export default function TabsLayout() {
   return (
     <Tabs
-      tabBar={(props) => <AppTabBar {...props} />}
+      tabBar={(props) => <NotchAppTabBar {...props} />}
       screenOptions={{
         headerShown: false,
         sceneStyle: { backgroundColor: Colors.dark.background },
