@@ -4,7 +4,7 @@ import { TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FullListSheet } from '../components/full-list-sheet';
-import { LiveListeningMeter, LiveTalkSession } from '../components/live-talk-session';
+import { LiveTalkSession } from '../components/live-talk-session';
 import { MicNeeded } from '../components/mic-needed';
 import { RecognizedList } from '../components/recognized-list';
 import { ShowCartButton } from '../components/show-cart-button';
@@ -147,7 +147,6 @@ export function VoiceScreen() {
           <MicNeeded onAllow={() => void request()} isRequesting={isRequesting} />
         ) : useLivePath ? (
           <LiveTalkSession>
-            <LiveListeningMeter />
             {bottomChrome}
           </LiveTalkSession>
         ) : (

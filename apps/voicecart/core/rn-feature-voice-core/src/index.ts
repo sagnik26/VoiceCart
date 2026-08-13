@@ -22,3 +22,9 @@ export {
   mapTrackVolumeToOrbLevel,
   type LiveKitConnection,
 } from './live-metering';
+export {
+  TALK_CONNECT_TIMEOUT_MS,
+  mapLiveKitConnectionState,
+  talkRoomStatusLabel,
+  type TalkRoomStatus,
+} from './talk-room-status';

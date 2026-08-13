@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   AudioSession,
   LiveKitRoom,
@@ -12,12 +12,16 @@ import { Box } from '@voicecart/rn-ui';
 import { Text } from '@voicecart/rn-ui';
 import { VStack } from '@voicecart/rn-ui';
 import {
+  TALK_CONNECT_TIMEOUT_MS,
   fetchLiveKitConnection,
+  mapLiveKitConnectionState,
   mapTrackVolumeToOrbLevel,
-  orbLabel,
+  talkRoomStatusLabel,
   type LiveKitConnection,
+  type TalkRoomStatus,
 } from '@voicecart/rn-feature-voice-core';
 
+import { TalkRoomFailed } from './talk-room-failed';
 import { VoiceOrb } from './voice-orb';
 
 type LiveTalkSessionProps = {
@@ -25,8 +29,19 @@ type LiveTalkSessionProps = {
 };
 
 export function LiveTalkSession({ children }: LiveTalkSessionProps) {
+  const [sessionKey, setSessionKey] = useState(0);
   const [connection, setConnection] = useState<LiveKitConnection | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const retry = useCallback(() => {
+    setError(null);
+    setConnection(null);
+    setSessionKey((key) => key + 1);
+  }, []);
+
+  const recover = useCallback(() => {
+    setError(null);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,21 +66,20 @@ export function LiveTalkSession({ children }: LiveTalkSessionProps) {
       cancelled = true;
       void AudioSession.stopAudioSession();
     };
-  }, []);
+  }, [sessionKey]);
 
-  if (error) {
-    return (
-      <Box className="flex-1 items-center justify-center px-2">
-        <VStack space="sm" className="items-center">
-          <Text size="md" className="text-center text-foreground">
-            Could not connect
-          </Text>
-          <Text size="sm" className="text-center text-muted-foreground">
-            {error}
-          </Text>
-        </VStack>
-      </Box>
-    );
+  useEffect(() => {
+    if (connection || error) {
+      return;
+    }
+    const timeout = setTimeout(() => {
+      setError('Timed out');
+    }, TALK_CONNECT_TIMEOUT_MS);
+    return () => clearTimeout(timeout);
+  }, [connection, error, sessionKey]);
+
+  if (error && !connection) {
+    return <TalkRoomFailed onRetry={retry} />;
   }
 
   if (!connection) {
@@ -76,7 +90,7 @@ export function LiveTalkSession({ children }: LiveTalkSessionProps) {
           size="sm"
           className="font-semibold uppercase tracking-widest text-muted-foreground"
         >
-          Connecting…
+          {talkRoomStatusLabel('connecting')}
         </Text>
       </VStack>
     );
@@ -90,18 +104,98 @@ export function LiveTalkSession({ children }: LiveTalkSessionProps) {
         audio
         video={false}
         connect
-        onError={(err) => setError(err.message)}
       >
-        {children}
+        <TalkRoomBody onFatal={setError} onRecover={recover} onRetry={retry}>
+          {children}
+        </TalkRoomBody>
       </LiveKitRoom>
     </Box>
   );
 }
 
-export function LiveListeningMeter() {
+type TalkRoomBodyProps = {
+  children: ReactNode;
+  onFatal: (reason: string) => void;
+  onRecover: () => void;
+  onRetry: () => void;
+};
+
+function TalkRoomBody({
+  children,
+  onFatal,
+  onRecover,
+  onRetry,
+}: TalkRoomBodyProps) {
   const connectionState = useConnectionState();
+  const roomStatus = useTalkRoomStatus(connectionState);
+  const [timedOut, setTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (roomStatus === 'connected' || roomStatus === 'reconnecting') {
+      setTimedOut(false);
+      onRecover();
+    }
+  }, [onRecover, roomStatus]);
+
+  useEffect(() => {
+    if (roomStatus !== 'connecting') {
+      return;
+    }
+    const timeout = setTimeout(() => {
+      setTimedOut(true);
+      onFatal('Timed out');
+    }, TALK_CONNECT_TIMEOUT_MS);
+    return () => clearTimeout(timeout);
+  }, [onFatal, roomStatus]);
+
+  useEffect(() => {
+    if (roomStatus === 'failed') {
+      onFatal('Disconnected');
+    }
+  }, [onFatal, roomStatus]);
+
+  const showFailed = roomStatus === 'failed' || timedOut;
+
+  if (showFailed) {
+    return (
+      <TalkRoomFailed onRetry={onRetry} />
+    );
+  }
+
+  return (
+    <>
+      <LiveListeningMeter roomStatus={roomStatus} />
+      {children}
+    </>
+  );
+}
+
+function useTalkRoomStatus(connectionState: ConnectionState): TalkRoomStatus {
+  const [everConnected, setEverConnected] = useState(false);
+
+  useEffect(() => {
+    if (connectionState === ConnectionState.Connected) {
+      setEverConnected(true);
+    }
+  }, [connectionState]);
+
+  const mapped = mapLiveKitConnectionState(connectionState);
+  if (mapped === 'failed' && !everConnected) {
+    return 'connecting';
+  }
+  return mapped;
+}
+
+type LiveListeningMeterProps = {
+  roomStatus?: TalkRoomStatus;
+};
+
+export function LiveListeningMeter({ roomStatus }: LiveListeningMeterProps) {
+  const connectionState = useConnectionState();
+  const mapped = mapLiveKitConnectionState(connectionState);
+  const resolvedStatus = roomStatus ?? (mapped === 'failed' ? 'connecting' : mapped);
   const { localParticipant, microphoneTrack } = useLocalParticipant();
-  const connected = connectionState === ConnectionState.Connected;
+  const connected = resolvedStatus === 'connected';
 
   const trackRef = useMemo(() => {
     if (!microphoneTrack) {
@@ -124,7 +218,7 @@ export function LiveListeningMeter() {
         size="sm"
         className="font-semibold uppercase tracking-widest text-muted-foreground"
       >
-        {connected ? orbLabel('listening') : 'Connecting…'}
+        {talkRoomStatusLabel(resolvedStatus)}
       </Text>
     </VStack>
   );

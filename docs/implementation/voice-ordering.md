@@ -11,9 +11,10 @@ This doc is VoiceCart **product wiring** for Talk — what the UI and agent tool
 
 ## Current state
 
-- **Phase 1 (level metering):** Talk can join an empty LiveKit room and drive the orb from `useTrackVolume` when `EXPO_PUBLIC_VOICE_USE_LIVE_METERING=true` and a token mint (or smoke token) is configured. Cancel unmounts the room. Mock RAF timeline remains when the flag is off. No agent, Sarvam, OpenAI, or Swiggy.
+- **Phase 2 (room lifecycle):** Live Talk shows Connecting / Listening / Reconnecting / Failed + Try again, with a 15s connect timeout. Retry remounts the session (new token). LiveKit SDK reconnect stays mounted. Mic denied is still Phase 0. Show cart stays disabled on the live path. Phase 1 orb metering is unchanged. No agent, Sarvam, OpenAI, or Swiggy.
+- **Phase 1 (level metering):** Talk can join an empty LiveKit room and drive the orb from `useTrackVolume` when `EXPO_PUBLIC_VOICE_USE_LIVE_METERING=true` and a token mint (or smoke token) is configured. Cancel unmounts the room. Mock RAF timeline remains when the flag is off.
 - **Phase 0 (native foundation):** LiveKit RN SDK + WebRTC Expo plugins are in the app; `registerGlobals()` runs at boot. Talk requests the microphone via `useMicPermission`. Deny shows a Microphone needed empty state.
-- `@voicecart/rn-feature-voice` — Talk + Disambiguation screens; `@voicecart/rn-feature-voice-core` holds mocks, mic permission, and live-metering config/token fetch.
+- `@voicecart/rn-feature-voice` — Talk + Disambiguation screens; `@voicecart/rn-feature-voice-core` holds mocks, mic permission, live-metering config, and talk room status helpers.
 - App route `apps/voicecart/src/app/voice.tsx` is a thin mount of `VoiceScreen`.
 - Typed text does not feed an agent or cart.
 - Disambiguation is still a placeholder screen.
