@@ -10,8 +10,6 @@ import { Colors, ThemeModeProvider, useThemeMode } from '@voicecart/rn-theme';
 
 import { setupLiveKit } from '../livekit-setup';
 
-// Pressto reads shared values when rebuilding animated styles on re-render.
-// Strict mode only warns; disable it for this known third-party pattern.
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
   strict: false,
@@ -32,14 +30,22 @@ function RootNavigator() {
           contentStyle: { backgroundColor: Colors.dark.background },
         }}
       >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="voice" options={{ animation: 'slide_from_bottom' }} />
-        <Stack.Screen name="disambiguation" />
+        <Stack.Screen name="decide" />
+        <Stack.Screen name="ingredient-list" />
+        <Stack.Screen name="reverse" />
+        <Stack.Screen name="pantry" />
+        <Stack.Screen name="menu" />
         <Stack.Screen name="cart" />
         <Stack.Screen name="order-status" />
         <Stack.Screen name="ingredients" />
         <Stack.Screen name="history" />
+        <Stack.Screen name="profile" />
         <Stack.Screen name="settings" />
+        <Stack.Screen name="disambiguation" />
       </Stack>
     </GluestackUIProvider>
   );

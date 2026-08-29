@@ -1,19 +1,17 @@
 import * as Linking from 'expo-linking';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { OrderSummaryCard } from '../components/order-summary-card';
 import { StatusHeader } from '../components/status-header';
 import { StatusStepper } from '../components/status-stepper';
-import { Box } from '@voicecart/rn-ui';
-import { Button, ButtonText } from '@voicecart/rn-ui';
-import { Text } from '@voicecart/rn-ui';
+import { Box, Button, ButtonText, HStack, Text } from '@voicecart/rn-ui';
 import { Brand } from '@voicecart/rn-theme';
 import {
-  orderPlanNote,
+  orderStatusNote,
   parsePlacedOrder,
   SWIGGY_TRACK_URL,
 } from '@voicecart/rn-feature-order-status-core';
@@ -32,7 +30,7 @@ export function OrderStatusScreen() {
   const { isDark } = useThemeMode();
 
   const order = useMemo(() => parsePlacedOrder(params), [params]);
-  const planNote = orderPlanNote(order.source, order.total);
+  const statusNote = orderStatusNote(order.source, order.total);
   const iconColor = isDark ? Brand.surface : Brand.ink;
 
   const onTrack = () => {
@@ -59,7 +57,7 @@ export function OrderStatusScreen() {
           itemCount={order.itemCount}
           total={order.total}
         />
-        <StatusStepper />
+        <StatusStepper source={order.source} />
 
         <Button
           variant="outline"
@@ -67,7 +65,7 @@ export function OrderStatusScreen() {
           className="h-11 w-full rounded-full"
           accessibilityLabel="Track on Swiggy"
         >
-          <View className="flex-row items-center gap-2">
+          <HStack className="items-center gap-2">
             <ButtonText>Track on Swiggy</ButtonText>
             <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
               <Path
@@ -78,11 +76,11 @@ export function OrderStatusScreen() {
                 strokeLinejoin="round"
               />
             </Svg>
-          </View>
+          </HStack>
         </Button>
 
         <Text size="sm" className="text-center text-muted-foreground">
-          {planNote}
+          {statusNote}
         </Text>
 
         <Button

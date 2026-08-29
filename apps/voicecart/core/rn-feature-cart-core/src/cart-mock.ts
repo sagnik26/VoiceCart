@@ -1,8 +1,4 @@
-import { HOME_PLAN } from '@voicecart/rn-feature-home-core';
-import { formatInr } from '@voicecart/rn-theme';
-import { getDishIngredients, resolveDish } from '@voicecart/rn-feature-kitchen-core';
-
-export type CartSource = 'food' | 'kitchen';
+export type CartSource = 'food' | 'instamart';
 
 export type CartLineItem = {
   id: string;
@@ -19,6 +15,8 @@ export type CartSnapshot = {
   distance: string;
   delivery: number;
   items: CartLineItem[];
+  substitutionNote?: string;
+  cookItCostNote?: string;
 };
 
 export type CartTotals = {
@@ -45,51 +43,48 @@ export type OrderStage = {
 };
 
 export const FOOD_DELIVERY = 29;
-export const KITCHEN_DELIVERY = 19;
+export const INSTAMART_DELIVERY = 19;
 export const SWIGGY_TRACK_URL = 'https://www.swiggy.com';
 
-export function buildFoodCart(): CartSnapshot {
+export function buildFoodCart(restaurant?: string): CartSnapshot {
   return {
     source: 'food',
-    restaurant: 'Saffron Table',
+    restaurant: restaurant ?? 'Saffron Spice',
     eta: '32–38 min',
     distance: '3.2 km',
     delivery: FOOD_DELIVERY,
+    cookItCostNote: 'Cooking this would cost roughly ₹140',
     items: [
-      { id: 'bc', name: 'Butter Chicken', price: 329, qty: 1, editable: true },
-      { id: 'gn', name: 'Garlic Naan', price: 79, qty: 2, editable: true },
-      { id: 'bir', name: 'Chicken Biryani', price: 249, qty: 1, editable: true },
+      { id: 'dt', name: 'Dal tadka', price: 160, qty: 1, editable: true },
+      { id: 'bn', name: 'Butter naan', price: 45, qty: 2, editable: true },
     ],
   };
 }
 
-export function buildKitchenCart(dish?: string): CartSnapshot {
-  const dishName = resolveDish(dish ?? '');
-  const ingredients = getDishIngredients(dishName).filter((item) => item.need);
-
+export function buildInstamartCart(dish?: string): CartSnapshot {
+  void dish;
   return {
-    source: 'kitchen',
+    source: 'instamart',
     restaurant: 'Instamart',
-    eta: '25–30 min',
+    eta: '14–20 min',
     distance: '1.8 km',
-    delivery: KITCHEN_DELIVERY,
-    items: ingredients.map((item) => ({
-      id: item.name,
-      name: `${item.name} · ${item.qty}`,
-      price: item.price,
-      qty: 1,
-      editable: false,
-    })),
+    delivery: INSTAMART_DELIVERY,
+    substitutionNote: 'Ghee out of stock — substituted with Amul butter',
+    items: [
+      { id: 'dal', name: 'Toor dal 200g', price: 42, qty: 1, editable: false },
+      { id: 'tomato', name: 'Tomato ×2', price: 18, qty: 1, editable: false },
+    ],
   };
 }
 
 export function resolveCartSource(raw?: string | string[]): CartSource {
   const value = Array.isArray(raw) ? raw[0] : raw;
-  return value === 'kitchen' ? 'kitchen' : 'food';
+  if (value === 'instamart' || value === 'kitchen') return 'instamart';
+  return 'food';
 }
 
-export function buildCart(source: CartSource, dish?: string): CartSnapshot {
-  return source === 'kitchen' ? buildKitchenCart(dish) : buildFoodCart();
+export function buildCart(source: CartSource, dish?: string, restaurant?: string): CartSnapshot {
+  return source === 'instamart' ? buildInstamartCart(dish) : buildFoodCart(restaurant);
 }
 
 export function computeTotals(items: CartLineItem[], delivery: number): CartTotals {
@@ -103,23 +98,8 @@ export function computeTotals(items: CartLineItem[], delivery: number): CartTota
   };
 }
 
-export function planImpactLine(source: CartSource, total: number): string {
-  if (source === 'kitchen') {
-    return "Instamart orders don't count toward your weekly plan.";
-  }
-  const remaining = Math.max(0, HOME_PLAN.limit - (HOME_PLAN.spent + total));
-  return `This order adds ₹${formatInr(total)} to your weekly plan — ₹${formatInr(remaining)} left.`;
-}
-
-export function orderPlanNote(source: CartSource, total: number): string {
-  if (source === 'kitchen') {
-    return "Instamart spend is tracked separately from your weekly food plan.";
-  }
-  return `₹${formatInr(total)} added to this week's plan.`;
-}
-
 export function placeOrderLabel(total: number): string {
-  return `Place order · ₹${formatInr(total)}`;
+  return `Place order · ₹${total.toLocaleString('en-IN')}`;
 }
 
 export function toPlacedOrder(cart: CartSnapshot, totals: CartTotals): PlacedOrder {
@@ -165,12 +145,30 @@ export function parsePlacedOrder(params: {
   };
 }
 
-export const ORDER_STAGES: OrderStage[] = [
-  { label: 'Order confirmed', sub: 'Restaurant has accepted', status: 'done' },
+export const FOOD_ORDER_STAGES: OrderStage[] = [
+  { label: 'Confirmed', sub: 'Restaurant has accepted', status: 'done' },
   { label: 'Preparing', sub: 'Your food is being cooked', status: 'current' },
-  { label: 'Out for delivery', sub: 'On the way to you', status: 'pending' },
+  { label: 'Picked up', sub: 'On the way to you', status: 'pending' },
   { label: 'Delivered', sub: 'Enjoy your meal', status: 'pending' },
 ];
+
+export const INSTAMART_ORDER_STAGES: OrderStage[] = [
+  { label: 'Order placed', sub: 'Instamart received your order', status: 'done' },
+  { label: 'Packed', sub: 'Items are being packed', status: 'current' },
+  { label: 'Out for delivery', sub: 'On the way to you', status: 'pending' },
+  { label: 'Delivered', sub: 'Ingredients at your door', status: 'pending' },
+];
+
+export function orderStagesForSource(source: CartSource): OrderStage[] {
+  return source === 'instamart' ? INSTAMART_ORDER_STAGES : FOOD_ORDER_STAGES;
+}
+
+export function orderStatusNote(source: CartSource, total: number): string {
+  if (source === 'instamart') {
+    return `Instamart · ₹${total.toLocaleString('en-IN')}`;
+  }
+  return `Restaurant order · ₹${total.toLocaleString('en-IN')}`;
+}
 
 export function changeQty(items: CartLineItem[], id: string, delta: number): CartLineItem[] {
   return items.map((item) => {

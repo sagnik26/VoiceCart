@@ -1,6 +1,6 @@
 # VoiceCart Design System
 
-Foundation for UI work. Product scope and screen specs live in [PRD-Voice-Food-Ordering-App.md](./PRD-Voice-Food-Ordering-App.md) (§7–8). High-fidelity interactive reference: `Voice Food Ordering App.dc.html` (Design scope package). Voice motion reference: `Voice Capture Animation Showcase.dc.html`.
+Foundation for UI work. Product scope and screen specs live in [PRD-Kitchen-First.md](./PRD-Kitchen-First.md) (§7–8). Wireframe reference: [kitchen-app-wireframes.html](./kitchen-app-wireframes.html).
 
 ## Stack
 
@@ -23,9 +23,9 @@ Source values: PRD §8, mapped onto gluestack CSS variables.
 
 | Role | Hex | Gluestack / Tailwind | Notes |
 | --- | --- | --- | --- |
-| Brand / primary CTA | `#D85A30` | `primary` | Talk button, primary buttons |
+| Brand / primary CTA | `#C9603A` | `primary` | Kitchen actions, primary buttons |
 | Success | `#1D9E75` | `success` | Confirmed chips, Have |
-| Warning | `#D19A2B` | `warning` | Plan impact advisories |
+| Warning | `#D19A2B` | `warning` | Advisories |
 | Accent | `#7C63C4` | (PRD only; use sparingly) | Preference cards |
 | Ink | `#2A2724` | `foreground` | Primary text |
 | Muted | `#6B655C` | `muted-foreground` | Labels |
@@ -55,20 +55,29 @@ Then keep this doc in sync.
 
 ```
 Root Stack
-├── (tabs)          ← tab bar visible
-│   ├── index       Home
-│   └── kitchen     Kitchen
-├── voice           Talk (center CTA → push; no tab bar)
-├── disambiguation
+├── index             Redirect → (tabs) or (onboarding)
+├── (onboarding)      Login, address, pantry setup
+├── (tabs)            ← 4-tab bar visible
+│   ├── index         Home
+│   ├── kitchen       Kitchen
+│   ├── order         Order (restaurant search)
+│   └── profile       Profile
+├── voice             Voice overlay (modal slide-up)
+├── decide
+├── ingredient-list
+├── ingredients       Have/Need selection
+├── reverse
+├── pantry
+├── menu
 ├── cart
 ├── order-status
-├── ingredients
 ├── history
-└── settings
+├── settings
+└── disambiguation    Legacy stub
 ```
 
-- Tab bar: Home · Talk · Kitchen (`@voicecart/rn-ui` `NotchAppTabBar`). The bar uses the app background (`Colors.dark.background`); its top edge is a single `border` hairline that runs straight, dips around the coral Talk button, then continues to Kitchen (no shadow on the button). Home and Kitchen highlight only their own icon: the Lottie is tinted `primary` when selected and `textSecondary` otherwise, plus a slight scale and a coral pill under the active icon. `AppTabBar` remains exported.
-- Talk calls `router.push('/voice')`; it is not a tab that keeps the bar.
+- Tab bar: Home · Kitchen · Order · Profile (`@voicecart/rn-ui` `KitchenAppTabBar`).
+- Voice calls `router.push('/voice')` from Home, Kitchen, and Order mic buttons.
 - Stack screens hide the tab bar by default.
 - Feature UI lives in `apps/voicecart/features/rn-feature-*`; routes under `apps/voicecart/src/app` only mount screens.
 
@@ -76,17 +85,26 @@ Root Stack
 
 | Screen | Route | Status |
 | --- | --- | --- |
+| Login | `/(onboarding)/login` | Implemented (mock OTP) |
+| Address & Swiggy link | `/(onboarding)/setup-address` | Implemented (mock) |
+| Pantry & diet setup | `/(onboarding)/setup-pantry` | Implemented (mock) |
 | Home | `/(tabs)` | Implemented (mock data) |
-| Kitchen | `/(tabs)/kitchen` | Implemented (mock data) |
-| Voice capture | `/voice` | Implemented (mock + orb) |
-| Disambiguation | `/disambiguation` | Placeholder |
-| Cart review | `/cart` | Implemented (mock data) |
-| Order status | `/order-status` | Implemented (mock data) |
+| Decide | `/decide` | Implemented (mock data) |
+| Kitchen home | `/(tabs)/kitchen` | Implemented (mock data) |
+| Ingredient list | `/ingredient-list` | Implemented (mock data) |
+| Reverse mode | `/reverse` | Implemented (mock data) |
 | Ingredient selection | `/ingredients` | Implemented (mock data) |
+| Pantry manager | `/pantry` | Implemented (mock data) |
+| Instamart cart review | `/cart?source=instamart` | Implemented (mock data) |
+| Kitchen order status | `/order-status?source=instamart` | Implemented (mock data) |
+| Restaurant search | `/(tabs)/order` | Implemented (mock data) |
+| Restaurant menu | `/menu` | Implemented (mock data) |
+| Food cart review | `/cart?source=food` | Implemented (mock data) |
+| Food order status | `/order-status?source=food` | Implemented (mock data) |
 | Order history | `/history` | Implemented (mock data) |
+| Voice capture | `/voice` | Implemented (mock + orb) |
+| Profile home | `/(tabs)/profile` | Implemented (mock data) |
 | Settings | `/settings` | Implemented (mock data) |
-
-Plan / Analytics from the PRD are not in the current design HTML shell; add when product asks.
 
 ## Component conventions
 

@@ -3,11 +3,11 @@ import { ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HomeHeader } from '../components/home-header';
-import { PlanCard } from '../components/plan-card';
+import { PantrySection } from '../components/pantry-section';
 import { RecentSection } from '../components/recent-section';
-import { SuggestedSection } from '../components/suggested-section';
-import { Box } from '@voicecart/rn-ui';
-import { VStack } from '@voicecart/rn-ui';
+import { TonightsPickCard } from '../components/tonights-pick-card';
+import { VoicePromptInput } from '../components/voice-prompt-input';
+import { Box, VStack } from '@voicecart/rn-ui';
 
 export function HomeScreen() {
   const router = useRouter();
@@ -24,13 +24,16 @@ export function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <VStack space="xl">
-          <HomeHeader onOpenSettings={() => router.push('/settings')} />
-          <PlanCard />
-          <SuggestedSection onReorder={() => router.push('/cart')} />
+          <HomeHeader onOpenProfile={() => router.push('/profile')} />
+          <VoicePromptInput onMicPress={() => router.push('/voice')} />
+          <TonightsPickCard onCompare={() => router.push('/decide')} />
           <RecentSection
             onSeeAll={() => router.push('/history')}
-            onReorder={() => router.push('/cart')}
+            onRecook={() =>
+              router.push({ pathname: '/ingredient-list', params: { dish: 'Dal Tadka' } })
+            }
           />
+          <PantrySection onManage={() => router.push('/pantry')} />
         </VStack>
       </ScrollView>
     </Box>

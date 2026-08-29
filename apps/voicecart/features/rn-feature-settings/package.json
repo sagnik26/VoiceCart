@@ -9,6 +9,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@voicecart/rn-feature-onboarding-core": "*",
     "@voicecart/rn-feature-settings-core": "*",
     "@voicecart/rn-theme": "*",
     "@voicecart/rn-ui": "*"

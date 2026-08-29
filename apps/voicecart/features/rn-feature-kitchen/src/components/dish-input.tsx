@@ -1,14 +1,14 @@
 import { TextInput } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 
-import { HStack } from '@voicecart/rn-ui';
-import { Pressable } from '@voicecart/rn-ui';
-import { Brand } from '@voicecart/rn-theme';
-import { useThemeMode } from '@voicecart/rn-theme';
+import { HStack, Pressable } from '@voicecart/rn-ui';
+import { Brand, useThemeMode } from '@voicecart/rn-theme';
 
 type DishInputProps = {
   value: string;
   onChangeText: (value: string) => void;
+  onMicPress?: () => void;
+  placeholder?: string;
 };
 
 function MicIcon() {
@@ -22,28 +22,35 @@ function MicIcon() {
   );
 }
 
-export function DishInput({ value, onChangeText }: DishInputProps) {
+export function DishInput({
+  value,
+  onChangeText,
+  onMicPress,
+  placeholder = 'What are you cooking?',
+}: DishInputProps) {
   const { isDark } = useThemeMode();
   const textColor = isDark ? Brand.surface : Brand.ink;
-  const placeholderColor = Brand.muted;
 
   return (
     <HStack className="items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-3">
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        placeholder="What are you cooking?"
-        placeholderTextColor={placeholderColor}
-        className="min-h-11 flex-1 text-[14.5px]"
-        style={{ color: textColor }}
+        placeholder={placeholder}
+        placeholderTextColor={Brand.muted}
+        style={{
+          color: textColor,
+          minHeight: 44,
+          flex: 1,
+          fontSize: 14.5,
+        }}
         returnKeyType="done"
         accessibilityLabel="Dish description"
       />
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Speak dish name"
-        // Visual only until speech is wired.
-        onPress={() => {}}
+        onPress={onMicPress}
         className="h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary"
       >
         <MicIcon />

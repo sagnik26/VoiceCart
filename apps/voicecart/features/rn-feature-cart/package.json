@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@voicecart/rn-feature-cart-core": "*",
+    "@voicecart/rn-feature-order-core": "*",
     "@voicecart/rn-theme": "*",
     "@voicecart/rn-ui": "*"
   },

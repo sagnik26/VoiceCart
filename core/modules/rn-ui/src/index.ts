@@ -1,5 +1,6 @@
 export { AppTabBar } from './app-tab-bar';
 export { NotchAppTabBar } from './notch-app-tab-bar';
+export { KitchenAppTabBar } from './kitchen-app-tab-bar';
 export { AnimatedSplashOverlay } from './animated-icon';
 export { HintRow } from './hint-row';
 export { ScreenPlaceholder } from './screen-placeholder';

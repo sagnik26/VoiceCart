@@ -1,75 +1,58 @@
-export type HomePlan = {
-  spent: number;
-  limit: number;
-  ordersUsed: number;
-  ordersLimit: number;
-  daysLeft: number;
-};
-
-export type SuggestedMeal = {
-  title: string;
-  restaurant: string;
-  price: number;
-  reason: string;
-};
-
-export type GroceryRoutine = {
-  title: string;
-  cadenceLabel: string;
-  summary: string;
-};
-
-export type RecentOrder = {
-  restaurant: string;
+export type HomeActivity = {
+  kind: 'cooked' | 'ordered';
+  label: string;
   date: string;
-  summary: string;
-  total: number;
+};
+
+export type PantryChip = {
+  name: string;
+  status: 'have' | 'low';
+};
+
+export type TonightsPick = {
+  dish: string;
+  cookCost: number;
+  orderCost: number;
+  servings: number;
 };
 
 export const HOME_USER = {
-  firstName: 'Aarav',
+  firstName: 'Aisha',
   avatarInitial: 'A',
 } as const;
 
-export const HOME_PLAN: HomePlan = {
-  spent: 2150,
-  limit: 4000,
-  ordersUsed: 3,
-  ordersLimit: 6,
-  daysLeft: 4,
+export const HOME_TONIGHTS_PICK: TonightsPick = {
+  dish: 'Dal tadka',
+  cookCost: 140,
+  orderCost: 380,
+  servings: 2,
 };
 
-export const HOME_SUGGESTED_MEAL: SuggestedMeal = {
-  title: 'Butter Chicken Thali',
-  restaurant: 'Saffron Table',
-  price: 349,
-  reason: 'You usually order dinner around now',
-};
+export const HOME_RECENT_ACTIVITY: HomeActivity[] = [
+  { kind: 'cooked', label: 'Rajma chawal', date: 'Yesterday' },
+  { kind: 'ordered', label: 'Paneer roll', date: 'Mon' },
+  { kind: 'cooked', label: 'Aloo paratha', date: 'Sat' },
+];
 
-export const HOME_GROCERY_ROUTINE: GroceryRoutine = {
-  title: 'Sunday grocery run',
-  cadenceLabel: 'Every Sunday',
-  summary: '8 usual items · milk, eggs, bread +5',
-};
-
-export const HOME_RECENT_ORDER: RecentOrder = {
-  restaurant: 'Saffron Table',
-  date: 'Aug 6',
-  summary: 'Butter Chicken, Garlic Naan ×2',
-  total: 487,
-};
-
-
-export function planPercent(plan: HomePlan): number {
-  return Math.min(100, Math.round((plan.spent / plan.limit) * 100));
-}
-
-export function planOrdersLeft(plan: HomePlan): number {
-  return Math.max(0, plan.ordersLimit - plan.ordersUsed);
-}
+export const HOME_PANTRY_CHIPS: PantryChip[] = [
+  { name: 'Rice', status: 'have' },
+  { name: 'Onion', status: 'have' },
+  { name: 'Milk', status: 'low' },
+  { name: 'Eggs', status: 'have' },
+];
 
 export function greetingForHour(hour: number = new Date().getHours()): string {
   if (hour < 12) return 'Good morning';
   if (hour < 17) return 'Good afternoon';
   return 'Good evening';
+}
+
+export function formatActivityRow(activity: HomeActivity): string {
+  const prefix = activity.kind === 'cooked' ? 'Cooked' : 'Ordered';
+  return `${prefix} · ${activity.label}`;
+}
+
+export function pantryChipLabel(chip: PantryChip): string {
+  if (chip.status === 'low') return `${chip.name} low`;
+  return `${chip.name} ✓`;
 }

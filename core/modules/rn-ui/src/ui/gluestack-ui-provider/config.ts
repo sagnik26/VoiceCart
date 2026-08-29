@@ -7,7 +7,7 @@ import { vars } from 'nativewind';
  */
 export const colors = {
   light: {
-    '--primary': '216 90 48',
+    '--primary': '201 96 58',
     '--primary-foreground': '255 255 255',
     '--secondary': '240 237 232',
     '--secondary-foreground': '42 39 36',
@@ -23,7 +23,7 @@ export const colors = {
     '--destructive-foreground': '255 255 255',
     '--border': '201 195 184',
     '--input': '201 195 184',
-    '--ring': '216 90 48',
+    '--ring': '201 96 58',
     '--accent': '240 237 232',
     '--accent-foreground': '42 39 36',
     '--success': '29 158 117',
@@ -32,7 +32,7 @@ export const colors = {
     '--warning-foreground': '42 39 36',
   },
   dark: {
-    '--primary': '216 90 48',
+    '--primary': '201 96 58',
     '--primary-foreground': '255 255 255',
     '--secondary': '46 42 38',
     '--secondary-foreground': '250 249 246',
@@ -48,7 +48,7 @@ export const colors = {
     '--destructive-foreground': '255 255 255',
     '--border': '58 54 50',
     '--input': '58 54 50',
-    '--ring': '216 90 48',
+    '--ring': '201 96 58',
     '--accent': '46 42 38',
     '--accent-foreground': '250 249 246',
     '--success': '29 158 117',

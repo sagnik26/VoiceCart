@@ -10,9 +10,7 @@ import { RecognizedList } from '../components/recognized-list';
 import { ShowCartButton } from '../components/show-cart-button';
 import { VoiceHeader } from '../components/voice-header';
 import { VoiceOrb } from '../components/voice-orb';
-import { Box } from '@voicecart/rn-ui';
-import { Text } from '@voicecart/rn-ui';
-import { VStack } from '@voicecart/rn-ui';
+import { Box, Button, ButtonText, Text, VStack } from '@voicecart/rn-ui';
 import { Brand } from '@voicecart/rn-theme';
 import {
   isLiveMeteringEnabled,
@@ -111,12 +109,19 @@ export function VoiceScreen() {
         <TextInput
           value={typedOrder}
           onChangeText={setTypedOrder}
-          placeholder="Type your order instead…"
+          placeholder="Type your request instead…"
           placeholderTextColor={Brand.muted}
-          className="rounded-lg border border-border bg-card px-3.5 py-3 text-[14px]"
-          style={{ color: textColor }}
+          style={{
+            color: textColor,
+            borderWidth: 1,
+            borderColor: Brand.border,
+            borderRadius: 8,
+            paddingHorizontal: 14,
+            paddingVertical: 12,
+            fontSize: 14,
+          }}
           returnKeyType="done"
-          accessibilityLabel="Type your order"
+          accessibilityLabel="Type your request"
         />
       ) : null}
 
@@ -128,6 +133,9 @@ export function VoiceScreen() {
       </View>
 
       <ShowCartButton enabled={cartEnabled} onPress={onShowCart} />
+      <Button variant="outline" onPress={() => setKeyboardOpen(true)} className="h-10 rounded-full">
+        <ButtonText>Type instead</ButtonText>
+      </Button>
     </VStack>
   );
 
@@ -142,6 +150,12 @@ export function VoiceScreen() {
           onToggleKeyboard={() => setKeyboardOpen((v) => !v)}
           keyboardOpen={keyboardOpen}
         />
+
+        <Box className="self-start rounded-md border border-primary/30 bg-primary/10 px-2 py-1">
+          <Text size="2xs" className="text-primary">
+            Used from Home, Kitchen and Order
+          </Text>
+        </Box>
 
         {micStatus === 'denied' ? (
           <MicNeeded onAllow={() => void request()} isRequesting={isRequesting} />

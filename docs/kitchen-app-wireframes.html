@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cook-first Kitchen App — Wireframes</title>
+<style>
+  :root{
+    --bg:#F0EFEC;
+    --frame:#FFFFFF;
+    --frame-border:#B9B5AC;
+    --ink:#2A2724;
+    --muted:#8A857C;
+    --line:#D8D4CB;
+    --block:#EDEBE5;
+    --block-strong:#DEDAD0;
+    --accent:#C9603A;
+    --accent-soft:#F1D9CC;
+    --tab-active:#2A2724;
+    --group-bg:#E7E4DD;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    padding:32px 24px 80px;
+  }
+  h1{
+    font-size:22px;
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+  }
+  .subhead{
+    color:var(--muted);
+    font-size:13px;
+    margin:0 0 36px;
+    max-width:640px;
+    line-height:1.5;
+  }
+  .group{
+    margin-bottom:44px;
+  }
+  .group-header{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:16px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .group-header .idx{
+    font-size:12px;
+    color:var(--muted);
+    font-variant-numeric:tabular-nums;
+    background:var(--group-bg);
+    border-radius:20px;
+    padding:3px 10px;
+  }
+  .group-header h2{
+    font-size:15px;
+    margin:0;
+    font-weight:600;
+  }
+  .group-header .note{
+    font-size:12px;
+    color:var(--muted);
+    margin-left:auto;
+  }
+  .row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:22px;
+  }
+  .phone{
+    width:230px;
+    background:var(--frame);
+    border:1px solid var(--frame-border);
+    border-radius:22px;
+    padding:8px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.04);
+    flex-shrink:0;
+  }
+  .phone-inner{
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    height:420px;
+    background:#fff;
+  }
+  .screen-label{
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--ink);
+    margin:10px 2px 6px;
+  }
+  .screen-num{
+    color:var(--muted);
+    font-weight:400;
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 12px 8px;
+    font-size:10.5px;
+    color:var(--muted);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar .app-title{
+    color:var(--ink);
+    font-weight:600;
+    font-size:11.5px;
+  }
+  .content{
+    flex:1;
+    overflow-y:auto;
+    padding:10px 10px 6px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .b-title{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    margin-top:2px;
+  }
+  .b-text{
+    font-size:9.5px;
+    color:var(--muted);
+    line-height:1.4;
+  }
+  .b-input{
+    border:1px solid var(--line);
+    background:var(--block);
+    border-radius:9px;
+    padding:8px 9px;
+    font-size:9.5px;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .b-input .mic{
+    width:14px;height:14px;border-radius:50%;
+    background:var(--accent-soft);
+    display:inline-block;
+    flex-shrink:0;
+  }
+  .b-button{
+    background:var(--ink);
+    color:#fff;
+    border-radius:9px;
+    padding:8px 10px;
+    font-size:10px;
+    font-weight:600;
+    text-align:center;
+  }
+  .b-button.secondary{
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--line);
+  }
+  .b-button.accent{
+    background:var(--accent);
+  }
+  .b-card{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:9px;
+    background:#fdfdfc;
+  }
+  .b-card .card-top{
+    display:flex;
+    justify-content:space-between;
+    font-size:10px;
+    font-weight:600;
+    margin-bottom:3px;
+  }
+  .b-card .card-sub{
+    font-size:9px;
+    color:var(--muted);
+  }
+  .b-card.two{
+    display:flex;
+    gap:6px;
+  }
+  .b-card.two .half{
+    flex:1;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:7px;
+  }
+  .b-card.two .half .htitle{
+    font-size:9.5px;
+    font-weight:700;
+  }
+  .b-card.two .half .hsub{
+    font-size:8.5px;
+    color:var(--muted);
+    margin-top:2px;
+  }
+  .b-list .item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid var(--line);
+    padding:6px 2px;
+    font-size:9.5px;
+  }
+  .b-list .item:last-child{border-bottom:none;}
+  .b-list .item .toggle{
+    width:26px;height:14px;
+    border-radius:8px;
+    background:var(--block-strong);
+    position:relative;
+    flex-shrink:0;
+  }
+  .b-list .item .toggle::after{
+    content:"";
+    position:absolute;
+    width:10px;height:10px;
+    border-radius:50%;
+    background:#fff;
+    border:1px solid var(--line);
+    top:1.5px;left:2px;
+  }
+  .b-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+  }
+  .chip{
+    background:var(--block);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:4px 9px;
+    font-size:8.5px;
+    color:var(--ink);
+  }
+  .chip.active{
+    background:var(--ink);
+    color:#fff;
+    border-color:var(--ink);
+  }
+  .b-stepper{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .b-stepper .step{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:9px;
+  }
+  .b-stepper .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--block-strong);
+    flex-shrink:0;
+  }
+  .b-stepper .dot.done{background:var(--ink);}
+  .b-imgph{
+    height:44px;
+    border-radius:8px;
+    background:repeating-linear-gradient(45deg,var(--block),var(--block) 6px,#fff 6px,#fff 12px);
+    border:1px solid var(--line);
+  }
+  .b-divider{
+    height:1px;
+    background:var(--line);
+    margin:2px 0;
+  }
+  .b-mic-big{
+    height:70px;
+    border-radius:14px;
+    background:var(--accent-soft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9px;
+    color:var(--accent);
+    font-weight:600;
+  }
+  .tabbar{
+    display:flex;
+    border-top:1px solid var(--line);
+    padding:7px 4px 8px;
+  }
+  .tabbar .tab{
+    flex:1;
+    text-align:center;
+    font-size:8px;
+    color:var(--muted);
+  }
+  .tabbar .tab .ic{
+    width:14px;height:14px;
+    border-radius:4px;
+    background:var(--block-strong);
+    margin:0 auto 3px;
+  }
+  .tabbar .tab.active{color:var(--tab-active);font-weight:700;}
+  .tabbar .tab.active .ic{background:var(--tab-active);}
+  .tabbar.hidden{visibility:hidden;height:0;padding:0;border:none;}
+  .overlay-tag{
+    display:inline-block;
+    font-size:9px;
+    color:var(--accent);
+    border:1px solid var(--accent-soft);
+    background:var(--accent-soft);
+    border-radius:6px;
+    padding:2px 6px;
+    margin-bottom:4px;
+    align-self:flex-start;
+  }
+</style>
+</head>
+<body>
+
+<h1>Cook-first Kitchen App — Screen Wireframes</h1>
+<p class="subhead">Structural wireframes: layout, hierarchy, and content per screen. Not final visual design — colors, icons and type are placeholders. 4 bottom tabs: Home · Kitchen · Order · Profile. Onboarding and shared screens sit outside the tab bar.</p>
+
+<div id="app"></div>
+
+<script>
+const TABS = ["Home","Kitchen","Order","Profile"];
+
+function tabbar(active){
+  if(active === null) return `<div class="tabbar hidden"></div>`;
+  return `<div class="tabbar">${TABS.map(t=>`<div class="tab ${t===active?'active':''}"><div class="ic"></div>${t}</div>`).join('')}</div>`;
+}
+
+function block(b){
+  switch(b.t){
+    case 'title': return `<div class="b-title">${b.v}</div>`;
+    case 'text': return `<div class="b-text">${b.v}</div>`;
+    case 'input': return `<div class="b-input"><span>${b.v}</span>${b.mic?'<span class="mic"></span>':''}</div>`;
+    case 'button': return `<div class="b-button ${b.style||''}">${b.v}</div>`;
+    case 'card': return `<div class="b-card"><div class="card-top"><span>${b.v}</span><span>${b.right||''}</span></div>${b.sub?`<div class="card-sub">${b.sub}</div>`:''}</div>`;
+    case 'cardtwo': return `<div class="b-card two">
+        <div class="half"><div class="htitle">${b.left.title}</div><div class="hsub">${b.left.sub}</div></div>
+        <div class="half"><div class="htitle">${b.right.title}</div><div class="hsub">${b.right.sub}</div></div>
+      </div>`;
+    case 'list': return `<div class="b-list">${b.items.map(i=>`<div class="item"><span>${i}</span>${b.toggle?'<span class="toggle"></span>':'<span>›</span>'}</div>`).join('')}</div>`;
+    case 'chips': return `<div class="b-chips">${b.items.map((i,idx)=>`<span class="chip ${b.active===idx?'active':''}">${i}</span>`).join('')}</div>`;
+    case 'stepper': return `<div class="b-stepper">${b.items.map((i,idx)=>`<div class="step"><span class="dot ${idx<=(b.done||0)?'done':''}"></span>${i}</div>`).join('')}</div>`;
+    case 'img': return `<div class="b-imgph"></div>`;
+    case 'divider': return `<div class="b-divider"></div>`;
+    case 'mic': return `<div class="b-mic-big">${b.v}</div>`;
+    case 'overlaytag': return `<div class="overlay-tag">${b.v}</div>`;
+    default: return '';
+  }
+}
+
+function phone(screen, num){
+  return `
+  <div>
+    <div class="screen-label"><span class="screen-num">${num}.</span> ${screen.title}</div>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="topbar"><span>${screen.back?'‹ back':'9:41'}</span><span class="app-title">${screen.appTitle||''}</span><span>${screen.right||''}</span></div>
+        <div class="content">${screen.blocks.map(block).join('')}</div>
+        ${tabbar(screen.tab===undefined?null:screen.tab)}
+      </div>
+    </div>
+  </div>`;
+}
+
+const DATA = [
+  {
+    title: "Onboarding — not in tab bar",
+    screens: [
+      {
+        title: "Login",
+        appTitle: "Welcome",
+        blocks: [
+          {t:'img'},
+          {t:'title', v:'Get started'},
+          {t:'text', v:'Enter your phone number to continue'},
+          {t:'input', v:'Phone number'},
+          {t:'button', v:'Send OTP', style:'accent'},
+          {t:'input', v:'Enter OTP'},
+          {t:'button', v:'Verify & continue'}
+        ]
+      },
+      {
+        title: "Address & Swiggy link",
+        appTitle: "Set up",
+        back:true,
+        blocks: [
+          {t:'title', v:'Link your Swiggy account'},
+          {t:'text', v:'So we can order and check delivery on your behalf'},
+          {t:'button', v:'Connect Swiggy account', style:'accent'},
+          {t:'divider'},
+          {t:'title', v:'Delivery address'},
+          {t:'input', v:'Search address'},
+          {t:'button', v:'Use current location', style:'secondary'},
+          {t:'button', v:'Continue'}
+        ]
+      },
+      {
+        title: "Pantry & diet setup",
+        appTitle: "Set up",
+        back:true,
+        blocks: [
+          {t:'title', v:'Diet preference'},
+          {t:'chips', items:['Veg','Non-veg','Eggetarian','Vegan'], active:0},
+          {t:'title', v:'Staples you usually have'},
+          {t:'text', v:'Tap to mark — these get remembered so you don\'t toggle every time'},
+          {t:'chips', items:['Salt','Oil','Onion','Garlic','Rice','Atta','Turmeric'], active:2},
+          {t:'button', v:'Done', style:'accent'},
+          {t:'button', v:'Skip for now', style:'secondary'}
+        ]
+      }
+    ]
+  },
+  {
+    title: "Home tab",
+    screens: [
+      {
+        title: "Home",
+        appTitle: "Home",
+        tab: "Home",
+        blocks: [
+          {t:'text', v:'Good evening, Aisha'},
+          {t:'input', v:'What do you want to eat?', mic:true},
+          {t:'title', v:'Tonight\'s pick'},
+          {t:'card', v:'Dal tadka', right:'₹140 to cook'},
+          {t:'text', v:'vs ₹380 to order — tap to compare'},
+          {t:'title', v:'Recent'},
+          {t:'list', items:['Cooked · Rajma chawal','Ordered · Paneer roll','Cooked · Aloo paratha']},
+          {t:'title', v:'Pantry'},
+          {t:'chips', items:['Rice ✓','Onion ✓','Milk low','Eggs ✓']}
+        ]
+      },
+      {
+        title: "Decide: cook vs order",
+        appTitle: "Dal tadka",
+        back:true,
+        blocks: [
+          {t:'title', v:'Dal tadka, for 2'},
+          {t:'text', v:'Here\'s how cooking compares to ordering it'},
+          {t:'cardtwo',
+            left:{title:'Cook it', sub:'3 items missing · ₹140 · ready in 25 min'},
+            right:{title:'Order it', sub:'Saffron Spice · ₹380 · 32 min ETA'}
+          },
+          {t:'button', v:'Get missing ingredients', style:'accent'},
+          {t:'button', v:'Order from restaurant', style:'secondary'},
+          {t:'text', v:'Calorie estimate: home-cooked is roughly 30% lighter'}
+        ]
+      }
+    ]
+  },
+  {
+    title: "Kitchen tab — flagship",
+    screens: [
+      {
+        title: "Kitchen home",
+        appTitle: "Kitchen",
+        tab: "Kitchen",
+        blocks: [
+          {t:'chips', items:['I want to cook…','What can I make?'], active:0},
+          {t:'input', v:'Describe a dish, e.g. \"dal for 2\"', mic:true},
+          {t:'title', v:'Recent dishes'},
+          {t:'chips', items:['Dal tadka','Aloo paratha','Veg pulao','Chole']},
+          {t:'title', v:'This week\'s batch'},
+          {t:'card', v:'Plan 3 dishes', right:'1 cart'}
+        ]
+      },
+      {
+        title: "Ingredient list",
+        appTitle: "Dal tadka",
+        back:true,
+        blocks: [
+          {t:'title', v:'Dal tadka'},
+          {t:'chips', items:['1 serving','2 servings','4 servings'], active:1},
+          {t:'list', items:['Toor dal — 200g','Onion — 1 medium','Tomato — 2','Ghee — 1 tbsp','Cumin seeds — 1 tsp']},
+          {t:'button', v:'Mark what you have →', style:'accent'}
+        ]
+      },
+      {
+        title: "Reverse mode — pantry to dish",
+        appTitle: "What can I cook?",
+        back:true,
+        blocks: [
+          {t:'title', v:'You said you have:'},
+          {t:'chips', items:['Rice','Dal','Onion','Tomato']},
+          {t:'title', v:'You could make'},
+          {t:'card', v:'Dal tadka', right:'0 missing'},
+          {t:'card', v:'Jeera rice', right:'1 missing'},
+          {t:'card', v:'Tomato rasam', right:'2 missing'},
+          {t:'text', v:'Sorted by fewest missing ingredients'}
+        ]
+      },
+      {
+        title: "Ingredient selection (Have/Need)",
+        appTitle: "Dal tadka",
+        back:true,
+        blocks: [
+          {t:'title', v:'Dal tadka · 2 servings'},
+          {t:'text', v:'Staples you usually have are pre-marked'},
+          {t:'list', toggle:true, items:['Toor dal — 200g','Onion — 1 (have)','Tomato — 2','Ghee (have)','Cumin seeds (have)']},
+          {t:'button', v:'Add 2 items to cart', style:'accent'}
+        ]
+      },
+      {
+        title: "Pantry manager",
+        appTitle: "Pantry",
+        back:true,
+        blocks: [
+          {t:'title', v:'Your staples'},
+          {t:'text', v:'These open pre-marked as \"have\" in every ingredient list'},
+          {t:'list', toggle:true, items:['Salt','Oil','Onion','Garlic paste','Rice','Turmeric']},
+          {t:'input', v:'Add a staple'},
+          {t:'title', v:'Running low'},
+          {t:'chips', items:['Milk','Eggs']}
+        ]
+      },
+      {
+        title: "Instamart cart review",
+        appTitle: "Cart",
+        back:true,
+        blocks: [
+          {t:'title', v:'2 items · Instamart'},
+          {t:'list', items:['Toor dal 200g — ₹42','Tomato x2 — ₹18']},
+          {t:'text', v:'Ghee out of stock — substituted with Amul butter'},
+          {t:'divider'},
+          {t:'card', v:'Total', right:'₹60 + fees'},
+          {t:'button', v:'Place order', style:'accent'}
+        ]
+      },
+      {
+        title: "Kitchen order status",
+        appTitle: "Order status",
+        back:true,
+        blocks: [
+          {t:'title', v:'Arriving in 14 min'},
+          {t:'stepper', done:1, items:['Order placed','Packed','Out for delivery','Delivered']},
+          {t:'text', v:'Instamart · 2 items · ₹60'},
+          {t:'button', v:'Track on Swiggy', style:'secondary'}
+        ]
+      }
+    ]
+  },
+  {
+    title: "Order tab (Swiggy Food)",
+    screens: [
+      {
+        title: "Restaurant search",
+        appTitle: "Order",
+        tab: "Order",
+        blocks: [
+          {t:'input', v:'Search restaurants or dishes', mic:true},
+          {t:'chips', items:['Under ₹300','Rated 4+','Veg only','< 30 min']},
+          {t:'card', v:'Saffron Spice', right:'₹380 for 2'},
+          {t:'card', v:'Punjab Grill Express', right:'₹420 for 2'},
+          {t:'card', v:'South Kitchen', right:'₹250 for 2'}
+        ]
+      },
+      {
+        title: "Restaurant menu",
+        appTitle: "Saffron Spice",
+        back:true,
+        blocks: [
+          {t:'text', v:'32 min · 4.3 ★ · Indiranagar'},
+          {t:'title', v:'Popular'},
+          {t:'list', items:['Paneer roll — ₹180','Dal tadka — ₹160','Butter naan — ₹45']},
+          {t:'title', v:'Mains'},
+          {t:'list', items:['Chole bhature — ₹190','Rajma chawal — ₹170']}
+        ]
+      },
+      {
+        title: "Food cart review",
+        appTitle: "Cart",
+        back:true,
+        blocks: [
+          {t:'title', v:'Saffron Spice'},
+          {t:'list', items:['Dal tadka x1 — ₹160','Butter naan x2 — ₹90']},
+          {t:'divider'},
+          {t:'card', v:'Item total', right:'₹250'},
+          {t:'card', v:'Delivery + taxes', right:'₹42'},
+          {t:'card', v:'To pay', right:'₹292'},
+          {t:'text', v:'Cooking this would cost roughly ₹140'},
+          {t:'button', v:'Place order', style:'accent'}
+        ]
+      },
+      {
+        title: "Food order status",
+        appTitle: "Order status",
+        back:true,
+        blocks: [
+          {t:'title', v:'Arriving in 28 min'},
+          {t:'stepper', done:1, items:['Confirmed','Preparing','Picked up','Delivered']},
+          {t:'text', v:'Saffron Spice · ₹292'},
+          {t:'button', v:'Track on Swiggy', style:'secondary'}
+        ]
+      }
+    ]
+  },
+  {
+    title: "Shared / cross-tab",
+    screens: [
+      {
+        title: "Order history",
+        appTitle: "History",
+        back:true,
+        blocks: [
+          {t:'chips', items:['All','Cooked','Ordered'], active:0},
+          {t:'list', items:['Today · Cooked · Dal tadka','Mon · Ordered · Paneer roll','Sat · Cooked · Veg pulao','Sat · Ordered · Masala dosa']},
+          {t:'button', v:'Recook Dal tadka', style:'secondary'}
+        ]
+      },
+      {
+        title: "Voice capture (overlay)",
+        appTitle: "Listening",
+        blocks: [
+          {t:'overlaytag', v:'Used from Home, Kitchen and Order'},
+          {t:'mic', v:'● listening…'},
+          {t:'text', v:'"make dal for two, I have onions"'},
+          {t:'chips', items:['Dal ✓','2 servings ✓','Onion: have ✓']},
+          {t:'button', v:'Show cart', style:'accent'},
+          {t:'button', v:'Type instead', style:'secondary'}
+        ]
+      }
+    ]
+  },
+  {
+    title: "Profile tab",
+    screens: [
+      {
+        title: "Profile home",
+        appTitle: "Profile",
+        tab: "Profile",
+        blocks: [
+          {t:'title', v:'Aisha Menon'},
+          {t:'text', v:'Swiggy account linked ✓'},
+          {t:'list', items:['Delivery address','Diet preference: Veg','Pantry manager','Order history']},
+          {t:'divider'},
+          {t:'list', items:['Settings','Help & support','Log out']}
+        ]
+      },
+      {
+        title: "Settings",
+        appTitle: "Settings",
+        back:true,
+        blocks: [
+          {t:'list', items:['Language: English/Hindi mix','Notifications','Linked accounts','Voice: on by default','About']}
+        ]
+      }
+    ]
+  }
+];
+
+const app = document.getElementById('app');
+let counter = 0;
+DATA.forEach((group, gi)=>{
+  const div = document.createElement('div');
+  div.className = 'group';
+  div.innerHTML = `
+    <div class="group-header">
+      <span class="idx">${gi+1}</span>
+      <h2>${group.title}</h2>
+      <span class="note">${group.screens.length} screen${group.screens.length>1?'s':''}</span>
+    </div>
+    <div class="row">
+      ${group.screens.map(s=>{counter++; return phone(s, counter);}).join('')}
+    </div>
+  `;
+  app.appendChild(div);
+});
+</script>
+
+</body>
+</html>

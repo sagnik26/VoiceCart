@@ -4,29 +4,25 @@ import { ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SettingsHeader } from '../components/settings-header';
-import { SettingsProfile } from '../components/settings-profile';
-import { LinkedBadge, SettingsRow } from '../components/settings-row';
+import { SettingsRow } from '../components/settings-row';
 import { SettingsSwitch } from '../components/settings-switch';
-import { Box } from '@voicecart/rn-ui';
-import { Text } from '@voicecart/rn-ui';
-import { VStack } from '@voicecart/rn-ui';
-import { SETTINGS_PROFILE } from '@voicecart/rn-feature-settings-core';
+import { Box, Button, ButtonText, Text, VStack } from '@voicecart/rn-ui';
+import { resetOnboardingForDev } from '@voicecart/rn-feature-onboarding-core';
 
 export function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [notificationsOn, setNotificationsOn] = useState(true);
+  const [voiceOn, setVoiceOn] = useState(true);
 
   const onBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace('/(tabs)');
-    }
+    if (router.canGoBack()) router.back();
+    else router.replace('/profile');
   };
 
   const onLogOut = () => {
-    router.replace('/(tabs)');
+    resetOnboardingForDev();
+    router.replace('/(onboarding)/login');
   };
 
   return (
@@ -40,31 +36,13 @@ export function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <SettingsHeader onBack={onBack} />
-        <SettingsProfile />
 
         <VStack>
           <SettingsRow
-            label="Order history"
-            showChevron
-            onPress={() => router.push('/history')}
-          />
-          <SettingsRow
-            label="Swiggy account"
-            trailing={<LinkedBadge label={SETTINGS_PROFILE.swiggyStatus} />}
-          />
-          <SettingsRow
-            label="Delivery address"
+            label="Language"
             trailing={
               <Text size="sm" className="text-muted-foreground">
-                {SETTINGS_PROFILE.address}
-              </Text>
-            }
-          />
-          <SettingsRow
-            label="Voice language"
-            trailing={
-              <Text size="sm" className="text-muted-foreground">
-                {SETTINGS_PROFILE.voiceLanguage}
+                English/Hindi mix
               </Text>
             }
           />
@@ -78,8 +56,32 @@ export function SettingsScreen() {
               />
             }
           />
+          <SettingsRow label="Linked accounts" showChevron onPress={() => {}} />
+          <SettingsRow
+            label="Voice"
+            trailing={
+              <SettingsSwitch
+                value={voiceOn}
+                onValueChange={setVoiceOn}
+                accessibilityLabel="Voice on by default"
+              />
+            }
+          />
+          <SettingsRow
+            label="About"
+            trailing={
+              <Text size="sm" className="text-muted-foreground">
+                v1.0
+              </Text>
+            }
+          />
           <SettingsRow label="Help & support" showChevron onPress={() => {}} />
-          <SettingsRow label="Log out" destructive showBorder={false} onPress={onLogOut} />
+          <SettingsRow
+            label="Log out"
+            destructive
+            showBorder={false}
+            onPress={onLogOut}
+          />
         </VStack>
       </ScrollView>
     </Box>

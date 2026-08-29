@@ -6,7 +6,7 @@
 import { Platform } from 'react-native';
 
 export const Brand = {
-  primary: '#D85A30',
+  primary: '#C9603A',
   success: '#1D9E75',
   warning: '#D19A2B',
   accent: '#7C63C4',

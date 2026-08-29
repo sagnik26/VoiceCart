@@ -7,18 +7,13 @@ import { CartHeader } from '../components/cart-header';
 import { CartLineItemRow } from '../components/cart-line-item';
 import { CartRestaurant } from '../components/cart-restaurant';
 import { CartTotalsBlock } from '../components/cart-totals';
-import { PlanImpactBanner } from '../components/plan-impact-banner';
-import { Box } from '@voicecart/rn-ui';
-import { Button, ButtonText } from '@voicecart/rn-ui';
-import { Pressable } from '@voicecart/rn-ui';
-import { Text } from '@voicecart/rn-ui';
-import { VStack } from '@voicecart/rn-ui';
+import { Box, Button, ButtonText, Text, VStack } from '@voicecart/rn-ui';
+import { getRestaurant } from '@voicecart/rn-feature-order-core';
 import {
   buildCart,
   changeQty,
   computeTotals,
   placeOrderLabel,
-  planImpactLine,
   resolveCartSource,
   toPlacedOrder,
   type CartLineItem,
@@ -27,16 +22,21 @@ import {
 export function CartScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ source?: string; dish?: string }>();
+  const params = useLocalSearchParams<{ source?: string; dish?: string; restaurant?: string }>();
 
   const source = resolveCartSource(params.source);
   const dish = typeof params.dish === 'string' ? params.dish : undefined;
-  const baseCart = useMemo(() => buildCart(source, dish), [dish, source]);
+  const restaurantId = typeof params.restaurant === 'string' ? params.restaurant : undefined;
+  const restaurantName = source === 'food' ? getRestaurant(restaurantId).name : undefined;
+  const baseCart = useMemo(
+    () => buildCart(source, dish, restaurantId),
+    [dish, restaurantId, source]
+  );
 
   const [items, setItems] = useState<CartLineItem[]>(baseCart.items);
-  const [loadedKey, setLoadedKey] = useState(`${source}:${dish ?? ''}`);
+  const [loadedKey, setLoadedKey] = useState(`${source}:${dish ?? ''}:${restaurantId ?? ''}`);
 
-  const cartKey = `${source}:${dish ?? ''}`;
+  const cartKey = `${source}:${dish ?? ''}:${restaurantId ?? ''}`;
   if (cartKey !== loadedKey) {
     setLoadedKey(cartKey);
     setItems(baseCart.items);
@@ -46,19 +46,15 @@ export function CartScreen() {
     () => computeTotals(items, baseCart.delivery),
     [baseCart.delivery, items]
   );
-  const impact = planImpactLine(source, totals.total);
   const isFood = source === 'food';
 
   const onBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-    } else {
-      router.replace(isFood ? '/voice' : '/ingredients');
-    }
+    if (router.canGoBack()) router.back();
+    else router.replace(isFood ? '/(tabs)/order' : '/ingredients');
   };
 
   const onPlaceOrder = () => {
-    const placed = toPlacedOrder({ ...baseCart, items }, totals);
+    const placed = toPlacedOrder({ ...baseCart, items, restaurant: restaurantName ?? baseCart.restaurant }, totals);
     router.replace({
       pathname: '/order-status',
       params: {
@@ -81,12 +77,12 @@ export function CartScreen() {
         >
           <CartHeader onBack={onBack} />
           <CartRestaurant
-            name={baseCart.restaurant}
+            name={restaurantName ?? baseCart.restaurant}
             eta={baseCart.eta}
             distance={baseCart.distance}
           />
 
-          <View className="border-t border-border">
+          <Box className="border-t border-border">
             {items.map((item) => (
               <CartLineItemRow
                 key={item.id}
@@ -95,22 +91,20 @@ export function CartScreen() {
                 onDec={() => setItems((prev) => changeQty(prev, item.id, -1))}
               />
             ))}
-          </View>
+          </Box>
+
+          {baseCart.substitutionNote ? (
+            <Text size="sm" className="text-muted-foreground">
+              {baseCart.substitutionNote}
+            </Text>
+          ) : null}
 
           <CartTotalsBlock totals={totals} />
-          <PlanImpactBanner message={impact} />
 
-          {isFood ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Add more by voice"
-              onPress={() => router.push('/voice')}
-              className="items-center rounded-lg border border-dashed border-border py-2.5"
-            >
-              <Text size="sm" className="font-semibold text-foreground">
-                + Add more by voice
-              </Text>
-            </Pressable>
+          {baseCart.cookItCostNote ? (
+            <Text size="sm" className="text-muted-foreground">
+              {baseCart.cookItCostNote}
+            </Text>
           ) : null}
         </ScrollView>
 

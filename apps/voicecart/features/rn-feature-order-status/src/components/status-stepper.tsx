@@ -1,10 +1,12 @@
 import { View } from 'react-native';
 
-import { HStack } from '@voicecart/rn-ui';
-import { Text } from '@voicecart/rn-ui';
-import { VStack } from '@voicecart/rn-ui';
+import { HStack, Text, VStack } from '@voicecart/rn-ui';
 import { Brand } from '@voicecart/rn-theme';
-import { ORDER_STAGES, type OrderStage } from '@voicecart/rn-feature-order-status-core';
+import {
+  orderStagesForSource,
+  type CartSource,
+  type OrderStage,
+} from '@voicecart/rn-feature-order-status-core';
 
 function dotColor(status: OrderStage['status']): string {
   if (status === 'done') return Brand.success;
@@ -17,11 +19,17 @@ function textClass(status: OrderStage['status']): string {
   return 'text-foreground';
 }
 
-export function StatusStepper() {
+type StatusStepperProps = {
+  source: CartSource;
+};
+
+export function StatusStepper({ source }: StatusStepperProps) {
+  const stages = orderStagesForSource(source);
+
   return (
     <VStack>
-      {ORDER_STAGES.map((stage, index) => {
-        const isLast = index === ORDER_STAGES.length - 1;
+      {stages.map((stage, index) => {
+        const isLast = index === stages.length - 1;
         return (
           <HStack key={stage.label} className="gap-3">
             <VStack className="items-center">
